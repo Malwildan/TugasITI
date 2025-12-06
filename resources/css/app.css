@@ -274,6 +274,274 @@
     letter-spacing: 0.05em;
   }
 
+  /* ===== NEW DARK ARCADE LOGIN THEME ===== */
+  .login-arcade-bg {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, #2d1b4e 0%, #1a0f2e 25%, #0d0620 50%, #1a0f2e 75%, #2d1b4e 100%);
+    position: relative;
+  }
+
+  .arcade-outer-card {
+    width: min(460px, 100%);
+    border-radius: 28px;
+    padding: 12px;
+    background: linear-gradient(135deg, #f8c8dc 0%, #b8e8fc 25%, #ffe4a0 50%, #c8f8e0 75%, #e0c8f8 100%);
+    box-shadow: 0 8px 0 rgba(0,0,0,0.3), 0 16px 40px rgba(0,0,0,0.4);
+  }
+
+  .arcade-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(180deg, #fef6f0 0%, #fce8e0 100%);
+    border: 3px solid #0a0a0a;
+    border-radius: 20px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 10px;
+  }
+
+  .arcade-dots-left,
+  .arcade-dots-right {
+    display: flex;
+    gap: 6px;
+  }
+
+  .arcade-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid #0a0a0a;
+  }
+
+  .arcade-dot--red { background: #ff6b8a; }
+  .arcade-dot--yellow { background: #ffe066; }
+  .arcade-dot--green { background: #7ee8a0; }
+  .arcade-dot--blue { background: #7ec8ff; }
+
+  .arcade-dot-ring {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 3px solid;
+    background: transparent;
+  }
+
+  .arcade-dot-ring--blue { border-color: #7ec8ff; }
+  .arcade-dot-ring--green { border-color: #7ee8a0; }
+  .arcade-dot-ring--yellow { border-color: #ffe066; }
+  .arcade-dot-ring--red { border-color: #ff6b8a; }
+
+  .arcade-header-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(0.55rem, 2.5vw, 0.75rem);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #0a0a0a;
+  }
+
+  .arcade-inner-panel {
+    background: linear-gradient(180deg, #1e1e3f 0%, #14142b 50%, #0d0d1a 100%);
+    border: 3px solid #0a0a0a;
+    border-radius: 16px;
+    padding: 1.5rem 1.25rem;
+    text-align: center;
+  }
+
+  .arcade-player-badge {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: #a0c8ff;
+    margin-bottom: 0.5rem;
+  }
+
+  .arcade-main-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(0.7rem, 3vw, 1rem);
+    letter-spacing: 0.15em;
+    color: #e0e8ff;
+    text-shadow: 0 0 10px rgba(160,200,255,0.3);
+    margin-bottom: 0.75rem;
+  }
+
+  .arcade-dots-indicator {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 1.25rem;
+  }
+
+  .arcade-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+  }
+
+  .arcade-indicator--active {
+    background: #6080a0;
+  }
+
+  .arcade-indicator--inactive {
+    background: #c0d0e0;
+  }
+
+  .arcade-dark-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    text-align: left;
+  }
+
+  .arcade-dark-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .arcade-dark-label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.12em;
+    color: #b0c8e0;
+  }
+
+  .arcade-dark-input {
+    border: 2px solid #3a3a5a;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    font-size: 0.9rem;
+    color: #c0d0e0;
+    background: linear-gradient(180deg, #2a2a4a 0%, #1a1a30 100%);
+    font-family: 'Nunito', sans-serif;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .arcade-dark-input::placeholder {
+    color: #6080a0;
+  }
+
+  .arcade-dark-input:focus {
+    outline: none;
+    border-color: #80a0c0;
+    box-shadow: 0 0 0 3px rgba(128,160,192,0.25);
+  }
+
+  .arcade-remember {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.5rem;
+    letter-spacing: 0.08em;
+    color: #b0c8e0;
+    cursor: pointer;
+  }
+
+  .arcade-checkbox {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #5080a0;
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    accent-color: #80c0e0;
+  }
+
+  .arcade-start-btn {
+    margin-top: 0.5rem;
+    border: 3px solid #0a0a0a;
+    border-radius: 999px;
+    padding: 1rem;
+    width: 100%;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: #0a0a0a;
+    background: linear-gradient(180deg, #ffb0c0 0%, #ff8fa8 50%, #ff6080 100%);
+    box-shadow: 0 6px 0 #0a0a0a;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    cursor: pointer;
+  }
+
+  .arcade-start-btn:hover {
+    transform: translateY(2px);
+    box-shadow: 0 4px 0 #0a0a0a;
+  }
+
+  .arcade-start-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #0a0a0a;
+  }
+
+  .arcade-start-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .arcade-footer-links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    padding: 0 0.25rem;
+  }
+
+  .arcade-footer-link {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.45rem;
+    letter-spacing: 0.08em;
+    color: #90a8c0;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+  }
+
+  .arcade-footer-link:hover {
+    color: #c0d8f0;
+  }
+
+  .arcade-insert-coin {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.5rem;
+    letter-spacing: 0.15em;
+    color: #6080a0;
+    margin-top: 1rem;
+    animation: blink 1.5s step-start infinite;
+  }
+
+  .arcade-dark-error {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.75rem;
+    color: #ff8090;
+    margin-top: 0.25rem;
+  }
+
+  .arcade-bottom-circles {
+    display: flex;
+    gap: 12px;
+    margin-top: 1.5rem;
+  }
+
+  .arcade-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.15);
+  }
+
+  .arcade-circle--pink { background: linear-gradient(135deg, #ffb0c0, #ff8090); }
+  .arcade-circle--mint { background: linear-gradient(135deg, #b0f0d0, #80e0b0); }
+  .arcade-circle--yellow { background: linear-gradient(135deg, #ffe080, #ffc040); }
+  .arcade-circle--cyan { background: linear-gradient(135deg, #b0e8ff, #80d0ff); }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+  /* ===== END DARK ARCADE LOGIN THEME ===== */
+
   .pixel-header {
     @apply uppercase tracking-widest font-extrabold text-gray-900;
   }
