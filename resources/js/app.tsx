@@ -3,6 +3,7 @@ import '@/lib/route'; // Initialize route() shim globally
 import { createRoot } from 'react-dom/client';
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { AuthProvider, ProtectedRoute } from '@/lib/auth';
 
 // Pages
 import Dashboard from './Pages/Dashboard';
@@ -17,50 +18,64 @@ import ProfileEdit from './Pages/Profile/Edit';
 
 function App() {
     return (
-        <BrowserRouter>
-            <Routes>
-                <Route
-                    path="/"
-                    element={<Login status={null as any} canResetPassword={true} />}
-                />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/continue" element={<Continue />} />
+        <AuthProvider>
+            <BrowserRouter>
+                <Routes>
+                    {/* Public */}
+                    <Route
+                        path="/"
+                        element={<Login status={null as any} canResetPassword={true} />}
+                    />
+                    <Route
+                        path="/login"
+                        element={<Login status={null as any} canResetPassword={true} />}
+                    />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/forgot-password" element={<ForgotPassword status={null as any} />} />
+                    <Route path="/reset-password" element={<ResetPassword token="" email="" />} />
+                    <Route path="/verify-email" element={<VerifyEmail status={undefined} />} />
+                    <Route path="/confirm-password" element={<ConfirmPassword />} />
+                    <Route path="/welcome" element={<Continue />} />
 
-                {/* Auth */}
-                <Route
-                    path="/login"
-                    element={<Login status={null as any} canResetPassword={true} />}
-                />
-                <Route path="/register" element={<Register />} />
-                <Route
-                    path="/forgot-password"
-                    element={<ForgotPassword status={null as any} />}
-                />
-                <Route
-                    path="/reset-password"
-                    element={<ResetPassword token="" email="" />}
-                />
-                <Route path="/verify-email" element={<VerifyEmail status={undefined} />} />
-                <Route path="/confirm-password" element={<ConfirmPassword />} />
+                    {/* Protected */}
+                    <Route
+                        path="/dashboard"
+                        element={
+                            <ProtectedRoute>
+                                <Dashboard />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/continue"
+                        element={
+                            <ProtectedRoute>
+                                <Continue />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/profile/edit"
+                        element={
+                            <ProtectedRoute>
+                                {
+                                    (
+                                        <ProfileEdit
+                                            auth={{ user: {} as any }}
+                                            mustVerifyEmail={false}
+                                            status={undefined}
+                                        />
+                                    ) as any
+                                }
+                            </ProtectedRoute>
+                        }
+                    />
 
-                {/* Profile */}
-                <Route
-                    path="/profile/edit"
-                    element={
-                        (
-                            <ProfileEdit
-                                auth={{ user: {} as any }}
-                                mustVerifyEmail={false}
-                                status={undefined}
-                            />
-                        ) as any
-                    }
-                />
-
-                {/* Fallback */}
-                <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-        </BrowserRouter>
+                    {/* Fallback */}
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+            </BrowserRouter>
+        </AuthProvider>
     );
 }
 

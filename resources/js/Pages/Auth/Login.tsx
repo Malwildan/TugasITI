@@ -1,10 +1,12 @@
 import { Head } from "@inertiajs/react";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
 
 export default function Login({ status, canResetPassword }: { status?: any; canResetPassword?: boolean }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as any)?.from?.pathname || "/dashboard";
   const [data, setData] = useState({ email: "", password: "", remember: false });
   const [processing, setProcessing] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
@@ -26,7 +28,7 @@ export default function Login({ status, canResetPassword }: { status?: any; canR
       else setErrors({ general: message });
       return;
     }
-    navigate("/dashboard");
+    navigate(from, { replace: true });
   };
 
   return (
@@ -47,7 +49,7 @@ export default function Login({ status, canResetPassword }: { status?: any; canR
 
             <div className="arcade-heading">
               <p className="arcade-label-sm">PLAYER SIGN-IN</p>
-              <h1 className="arcade-title">WELCOME BACK</h1>
+              <h1 className="arcade-title">WELCOME LADS!</h1>
               <p className="arcade-subtitle">ENTER YOUR CREDENTIALS</p>
             </div>
 
