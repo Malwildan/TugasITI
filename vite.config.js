@@ -1,13 +1,20 @@
 import { defineConfig } from 'vite';
-import laravel from 'laravel-vite-plugin';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-    plugins: [
-        laravel({
-            input: 'resources/js/app.tsx',
-            refresh: true,
-        }),
-        react(),
-    ],
+    plugins: [react()],
+    root: '.',
+    server: {
+        port: 5173,
+        open: true,
+    },
+    build: {
+        outDir: 'dist',
+    },
+    resolve: {
+        alias: {
+            '@': '/resources/js',
+            '@inertiajs/react': '/resources/js/inertia-shim.tsx',
+        },
+    },
 });

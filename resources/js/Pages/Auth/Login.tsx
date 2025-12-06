@@ -1,23 +1,40 @@
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Head } from "@inertiajs/react";
+import { useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 
-export default function Login({ status, canResetPassword }) {
-  const { data, setData, post, processing, errors } = useForm({
-    email: "",
-    password: "",
-    remember: false,
-  });
+export default function Login({ status, canResetPassword }: { status?: any; canResetPassword?: boolean }) {
+  const navigate = useNavigate();
+  const [data, setData] = useState({ email: "", password: "", remember: false });
+  const [processing, setProcessing] = useState(false);
+  const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
 
-  const submit = (e) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    post(route("login"));
+    setProcessing(true);
+    setErrors({});
+    const { error } = await supabase.auth.signInWithPassword({
+      email: data.email,
+      password: data.password,
+    });
+    setProcessing(false);
+    if (error) {
+      const message = error.message || "Login failed";
+      // naive error mapping
+      if (message.toLowerCase().includes("email")) setErrors((p) => ({ ...p, email: message }));
+      else if (message.toLowerCase().includes("password")) setErrors((p) => ({ ...p, password: message }));
+      else setErrors({ general: message });
+      return;
+    }
+    navigate("/dashboard");
   };
 
   return (
     <>
       <Head title="Login" />
 
-      <div className="login-arcade-wrapper">
-        <div className="arcade-card">
+      <div className="min-h-screen w-full bg-gray-50 py-10">
+        <div className="mx-auto max-w-2xl px-6">
           <div className="arcade-panel">
             <div className="arcade-nav">
               <span className="arcade-nav__title">Student Arcade</span>
@@ -43,7 +60,7 @@ export default function Login({ status, canResetPassword }) {
                   className="arcade-input"
                   placeholder="player@arcade.edu"
                   value={data.email}
-                  onChange={(e) => setData("email", e.target.value)}
+                  onChange={(e) => setData({ ...data, email: e.target.value })}
                   required
                 />
                 {errors.email && (
@@ -59,7 +76,7 @@ export default function Login({ status, canResetPassword }) {
                   className="arcade-input"
                   placeholder="••••••••"
                   value={data.password}
-                  onChange={(e) => setData("password", e.target.value)}
+                  onChange={(e) => setData({ ...data, password: e.target.value })}
                   required
                 />
                 {errors.password && (
@@ -74,10 +91,18 @@ export default function Login({ status, canResetPassword }) {
 
             {canResetPassword && (
               <div className="arcade-links">
-                <Link href={route("password.request")} className="arcade-link">
+                <RouterLink to="/forgot-password" className="arcade-link">
                   Forgot password?
-                </Link>
+                </RouterLink>
               </div>
+            )}
+            <div className="arcade-links mt-2">
+              <RouterLink to="/register" className="arcade-link">
+                Create an account
+              </RouterLink>
+            </div>
+            {errors.general && (
+              <p className="arcade-error mt-2">{errors.general}</p>
             )}
           </div>
         </div>

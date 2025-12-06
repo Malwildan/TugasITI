@@ -112,7 +112,7 @@ export default function Dashboard() {
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t-4 border-black pt-4">
-        <Link href={route("continue") as string} className="pixel-button bg-[#FFD6FF]">Continue</Link>
+        <Link href={route("continue") as string} className="pixel-button bg-[#FFD6FF]">EXIT</Link>
         <div className="pixel-font text-xs uppercase text-gray-700">Coins ready.</div>
       </div>
       </div>
