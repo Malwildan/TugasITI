@@ -33,80 +33,105 @@ export default function Login({ status, canResetPassword }: { status?: any; canR
 
   return (
     <>
-      <Head title="Login" />
+      <Head title="Login Station" />
 
-      <div className="min-h-screen w-full bg-gray-50 py-10">
-        <div className="mx-auto max-w-2xl px-6">
-          <div className="arcade-panel">
-            <div className="arcade-nav">
-              <span className="arcade-nav__title">Student Arcade</span>
-              <div className="nav-ornament" aria-hidden="true">
-                <span className="dot pink" />
-                <span className="dot mint" />
-                <span className="dot cyan" />
-              </div>
+      <div className="login-arcade-bg">
+        {/* Outer Card - Pastel gradient border */}
+        <div className="arcade-outer-card">
+          {/* Header Bar */}
+          <div className="arcade-header-bar">
+            <div className="arcade-dots-left">
+              <span className="arcade-dot arcade-dot--red" />
+              <span className="arcade-dot arcade-dot--yellow" />
+              <span className="arcade-dot arcade-dot--green" />
+              <span className="arcade-dot arcade-dot--blue" />
+            </div>
+            <span className="arcade-header-title">STUDENT ARCADE</span>
+            <div className="arcade-dots-right">
+              <span className="arcade-dot-ring arcade-dot-ring--blue" />
+              <span className="arcade-dot-ring arcade-dot-ring--green" />
+              <span className="arcade-dot-ring arcade-dot-ring--yellow" />
+              <span className="arcade-dot-ring arcade-dot-ring--red" />
+            </div>
+          </div>
+
+          {/* Inner Dark Panel */}
+          <div className="arcade-inner-panel">
+            <div className="arcade-player-badge">PLAYER 01</div>
+            <h1 className="arcade-main-title">PLAYER ACCESS REQUIRED</h1>
+            <div className="arcade-dots-indicator">
+              <span className="arcade-indicator arcade-indicator--inactive" />
+              <span className="arcade-indicator arcade-indicator--active" />
+              <span className="arcade-indicator arcade-indicator--active" />
             </div>
 
-            <div className="arcade-heading">
-              <p className="arcade-label-sm">PLAYER SIGN-IN</p>
-              <h1 className="arcade-title">WELCOME LADS!</h1>
-              <p className="arcade-subtitle">ENTER YOUR CREDENTIALS</p>
-            </div>
-
-            <form onSubmit={submit} className="arcade-form">
-              <div className="arcade-field">
-                <label htmlFor="email" className="arcade-label">EMAIL</label>
+            <form onSubmit={submit} className="arcade-dark-form">
+              <div className="arcade-dark-field">
+                <label htmlFor="email" className="arcade-dark-label">PLAYER ID // EMAIL</label>
                 <input
                   id="email"
                   type="email"
-                  className="arcade-input"
+                  className="arcade-dark-input"
                   placeholder="player@arcade.edu"
                   value={data.email}
                   onChange={(e) => setData({ ...data, email: e.target.value })}
                   required
                 />
-                {errors.email && (
-                  <p className="arcade-error">{errors.email}</p>
-                )}
+                {errors.email && <p className="arcade-dark-error">{errors.email}</p>}
               </div>
 
-              <div className="arcade-field">
-                <label htmlFor="password" className="arcade-label">PASSWORD</label>
+              <div className="arcade-dark-field">
+                <label htmlFor="password" className="arcade-dark-label">PASSWORD // KEYCODE</label>
                 <input
                   id="password"
                   type="password"
-                  className="arcade-input"
+                  className="arcade-dark-input"
                   placeholder="••••••••"
                   value={data.password}
                   onChange={(e) => setData({ ...data, password: e.target.value })}
                   required
                 />
-                {errors.password && (
-                  <p className="arcade-error">{errors.password}</p>
-                )}
+                {errors.password && <p className="arcade-dark-error">{errors.password}</p>}
               </div>
 
-              <button type="submit" className="arcade-btn" disabled={processing}>
-                Login
+              <label className="arcade-remember">
+                <input
+                  type="checkbox"
+                  checked={data.remember}
+                  onChange={(e) => setData({ ...data, remember: e.target.checked })}
+                  className="arcade-checkbox"
+                />
+                <span>Remember Player</span>
+              </label>
+
+              <button type="submit" className="arcade-start-btn" disabled={processing}>
+                {processing ? "LOADING..." : "PRESS TO START"}
               </button>
             </form>
 
-            {canResetPassword && (
-              <div className="arcade-links">
-                <RouterLink to="/forgot-password" className="arcade-link">
-                  Forgot password?
+            <div className="arcade-footer-links">
+              {canResetPassword && (
+                <RouterLink to="/forgot-password" className="arcade-footer-link">
+                  Forgot Keycode?
                 </RouterLink>
-              </div>
-            )}
-            <div className="arcade-links mt-2">
-              <RouterLink to="/register" className="arcade-link">
-                Create an account
+              )}
+              <RouterLink to="/register" className="arcade-footer-link">
+                New Player? Register
               </RouterLink>
             </div>
-            {errors.general && (
-              <p className="arcade-error mt-2">{errors.general}</p>
-            )}
+
+            {errors.general && <p className="arcade-dark-error text-center">{errors.general}</p>}
+
+            <p className="arcade-insert-coin">INSERT COIN PLEASE</p>
           </div>
+        </div>
+
+        {/* Bottom Decorative Circles */}
+        <div className="arcade-bottom-circles">
+          <span className="arcade-circle arcade-circle--pink" />
+          <span className="arcade-circle arcade-circle--mint" />
+          <span className="arcade-circle arcade-circle--yellow" />
+          <span className="arcade-circle arcade-circle--cyan" />
         </div>
       </div>
     </>
