@@ -1,3 +1,4 @@
+import { Link as RouterLink } from "react-router-dom";
 import { Link } from "@inertiajs/react";
 
 export default function Dashboard() {
@@ -109,6 +110,46 @@ export default function Dashboard() {
         <button className="pixel-button">Open</button>
         </div>
       </div>
+      </div>
+
+      {/* Games section */}
+      <div className="mt-8">
+        <div className="flex items-center justify-between border-b-4 border-black pb-4">
+          <div className="flex items-center gap-3">
+            <span className="pixel-font text-xs">Level 02 - Games</span>
+            <div className="flex gap-1">
+              <span className="status-led bg-[#FF8AAE]" />
+              <span className="status-led bg-[#F9F871]" />
+              <span className="status-led bg-[#8EF6E4]" />
+            </div>
+          </div>
+          <p className="pixel-font text-xs">Select a game</p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3 mt-6">
+          {/* Game 1 */}
+          <div className="arcade-cab arcade-cab--mint cab-bob">
+            <div className="arcade-marquee">Sum Fruit</div>
+            <div className="arcade-screen crt-overlay">
+              <p className="pixel-font text-[10px] text-[#C7FFE3]">Mini Game</p>
+              <h2 className="mt-4 text-2xl font-extrabold tracking-wide text-white">Add to Ten</h2>
+              <p className="mt-2 text-sm text-[#dfffea]">Drag to select apples whose total equals ten.</p>
+              <div className="mt-auto flex items-center justify-between text-[10px] text-[#f9f4ff]">
+                <span>Mode: Classic</span>
+                <span>Time: 120s</span>
+              </div>
+            </div>
+            <div className="arcade-controls">
+              <div className="joystick" />
+              <div className="button-grid"><span /><span /><span /><span /></div>
+              <a href="/resources/js/Pages/sumgame.html" className="pixel-button" target="_blank" rel="noopener noreferrer">Play</a>
+            </div>
+          </div>
+
+          
+
+          
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t-4 border-black pt-4">
