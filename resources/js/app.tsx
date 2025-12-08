@@ -1,4 +1,7 @@
 import '../css/app.css';
+import '../css/stat-lab.css';
+import '../css/classmates.css';
+import '../css/memory-reel.css';
 import '@/lib/route'; // Initialize route() shim globally
 import { createRoot } from 'react-dom/client';
 import React from 'react';
@@ -8,6 +11,8 @@ import { AuthProvider, ProtectedRoute } from '@/lib/auth';
 // Pages
 import Dashboard from './Pages/Dashboard';
 import Classmates from './Pages/Classmates';
+import StatLab from './Pages/StatLab';
+import MemoryReel from './Pages/MemoryReel';
 import Continue from './Pages/Continue';
 import Login from './Pages/Auth/Login';
 import Register from './Pages/Auth/Register';
@@ -52,6 +57,22 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <Classmates />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/stat-lab"
+                        element={
+                            <ProtectedRoute>
+                                <StatLab />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/memory-reel"
+                        element={
+                            <ProtectedRoute>
+                                <MemoryReel />
                             </ProtectedRoute>
                         }
                     />
