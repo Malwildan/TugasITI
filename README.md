@@ -1,5 +1,4 @@
-# Frontend-Only Setup
-
+# Setup
 This repo has been converted to a standalone React + Vite + Tailwind project.
 
 ## Prerequisites
