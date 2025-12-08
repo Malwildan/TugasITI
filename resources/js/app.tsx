@@ -7,6 +7,7 @@ import { AuthProvider, ProtectedRoute } from '@/lib/auth';
 
 // Pages
 import Dashboard from './Pages/Dashboard';
+import Classmates from './Pages/Classmates';
 import Continue from './Pages/Continue';
 import Login from './Pages/Auth/Login';
 import Register from './Pages/Auth/Register';
@@ -43,6 +44,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <Dashboard />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/classmates"
+                        element={
+                            <ProtectedRoute>
+                                <Classmates />
                             </ProtectedRoute>
                         }
                     />

@@ -3,6 +3,7 @@
 
 const routes: Record<string, string> = {
   dashboard: '/dashboard',
+  classmates: '/classmates',
   login: '/login',
   register: '/register',
   'password.request': '/forgot-password',
@@ -11,6 +12,7 @@ const routes: Record<string, string> = {
   'password.confirm': '/confirm-password',
   'profile.edit': '/profile/edit',
   logout: '/logout',
+  continue: '/continue',
 };
 
 export function route(name: string, params?: Record<string, any>): string {
