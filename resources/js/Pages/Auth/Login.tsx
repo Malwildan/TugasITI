@@ -40,19 +40,7 @@ export default function Login({ status, canResetPassword }: { status?: any; canR
         <div className="arcade-outer-card">
           {/* Header Bar */}
           <div className="arcade-header-bar">
-            <div className="arcade-dots-left">
-              <span className="arcade-dot arcade-dot--red" />
-              <span className="arcade-dot arcade-dot--yellow" />
-              <span className="arcade-dot arcade-dot--green" />
-              <span className="arcade-dot arcade-dot--blue" />
-            </div>
             <span className="arcade-header-title">STUDENT ARCADE</span>
-            <div className="arcade-dots-right">
-              <span className="arcade-dot-ring arcade-dot-ring--blue" />
-              <span className="arcade-dot-ring arcade-dot-ring--green" />
-              <span className="arcade-dot-ring arcade-dot-ring--yellow" />
-              <span className="arcade-dot-ring arcade-dot-ring--red" />
-            </div>
           </div>
 
           {/* Inner Dark Panel */}

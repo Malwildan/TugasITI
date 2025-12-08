@@ -307,7 +307,7 @@
   }
 
   .arcade-outer-card {
-    width: min(520px, 95%);
+    width: min(620px, 95%);
     border-radius: 36px;
     padding: 14px;
     background: linear-gradient(
@@ -343,7 +343,7 @@
   .arcade-header-bar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     background: linear-gradient(180deg, #fff8f0 0%, #ffe8e0 50%, #ffd8d0 100%);
     border: 4px solid #0a0a0a;
     border-radius: 24px;
@@ -890,7 +890,7 @@
 
   .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
     margin-bottom: 1.5rem;
   }
@@ -934,6 +934,20 @@
 
   .arcade-machine--purple {
     background: linear-gradient(180deg, #d8c0e8 0%, #c0a0d8 50%, #a888c8 100%);
+  }
+
+  .arcade-machine--locked {
+    background: linear-gradient(180deg, #c8c8c8 0%, #b0b0b0 50%, #989898 100%);
+    opacity: 0.7;
+  }
+
+  .arcade-machine--locked .machine-marquee {
+    background: rgba(200, 200, 200, 0.8);
+    color: #666;
+  }
+
+  .arcade-machine--locked .machine-screen {
+    background: linear-gradient(180deg, #5a5a5a 0%, #4a4a4a 50%, #3a3a3a 100%);
   }
 
   .machine-marquee {
@@ -1080,6 +1094,7 @@
   .btn-yellow { background: linear-gradient(135deg, #e0c080, #c0a050); }
   .btn-mint { background: linear-gradient(135deg, #90d8b8, #60b890); }
   .btn-cyan { background: linear-gradient(135deg, #90c8e0, #60a8c8); }
+  .btn-gray { background: linear-gradient(135deg, #c0c0c0, #909090); }
 
   .machine-action-btn {
     font-family: 'Press Start 2P', monospace;
@@ -1098,6 +1113,28 @@
   .machine-action-btn:hover {
     transform: translateY(2px);
     box-shadow: 0 2px 0 #0a0a0a;
+  }
+
+  .machine-action-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 #0a0a0a;
+  }
+
+  .machine-action-btn--disabled {
+    opacity: 0.5;
+    background: linear-gradient(180deg, #d0d0d0, #b8b8b8);
+    color: #888;
+    cursor: not-allowed;
+  }
+
+  .machine-action-btn--disabled:hover {
+    transform: none;
+    box-shadow: 0 4px 0 #0a0a0a;
+  }
+
+  .machine-action-btn--disabled:active {
+    transform: none;
+    box-shadow: 0 4px 0 #0a0a0a;
   }
 
   .dashboard-footer-bar {
@@ -5174,6 +5211,116 @@
   box-shadow: 0 2px 0 #993311;
 }
 
+/* Your Profile Card */
+.your-profile-card {
+  background: linear-gradient(135deg, rgba(100, 200, 255, 0.15), rgba(100, 150, 255, 0.1));
+  border: 3px solid #66ddff;
+  border-radius: 16px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 10;
+  animation: profileGlow 3s ease-in-out infinite;
+}
+
+@keyframes profileGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(102, 221, 255, 0.4); }
+  50% { box-shadow: 0 0 20px 5px rgba(102, 221, 255, 0.2); }
+}
+
+.your-profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.your-profile-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  color: #66ddff;
+  text-shadow: 0 0 10px rgba(102, 221, 255, 0.5);
+}
+
+.edit-profile-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  background: linear-gradient(180deg, #4488ff, #2266dd);
+  border: 2px solid #66ddff;
+  color: #fff;
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 3px 0 #0044aa;
+}
+
+.edit-profile-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 #0044aa;
+  background: linear-gradient(180deg, #5599ff, #3377ee);
+}
+
+.edit-profile-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 0 #0044aa;
+}
+
+.your-profile-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.your-profile-info {
+  flex: 1;
+}
+
+.your-profile-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.8rem;
+  color: #66ddff;
+  margin: 0 0 0.3rem;
+}
+
+.your-profile-fullname {
+  font-family: 'VT323', monospace;
+  font-size: 1rem;
+  color: #b4d8ff;
+  margin: 0;
+}
+
+.your-profile-stats {
+  display: flex;
+  gap: 1rem;
+}
+
+.your-profile-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem 0.8rem;
+  background: rgba(100, 150, 255, 0.1);
+  border: 2px solid #4488ff;
+  border-radius: 8px;
+}
+
+.your-profile-stat .stat-label {
+  font-family: 'VT323', monospace;
+  font-size: 0.85rem;
+  color: #88aaff;
+  margin-bottom: 0.3rem;
+}
+
+.your-profile-stat .stat-value {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  color: #66ddff;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .add-profile-warning {
@@ -5228,7 +5375,9 @@
 ======================================== */
 
 .profile-form-modal {
-  max-width: 420px;
+  max-width: 450px;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .form-title {
@@ -5361,6 +5510,43 @@
 
 .form-input::placeholder {
   color: #5a5a7e;
+}
+
+/* Select styling (for zodiac, mbti, drink dropdowns) */
+.form-input[type="date"],
+.form-input[type="select"],
+select.form-input {
+  background: linear-gradient(180deg, #1a1a3e, #0f0f2a);
+  border: 2px solid #4a4a7e;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-family: 'VT323', monospace;
+  font-size: 1.2rem;
+  color: #fff;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23fff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+
+.form-input[type="date"]:focus,
+select.form-input:focus {
+  outline: none;
+  border-color: #88aaff;
+  box-shadow: 0 0 10px rgba(136, 170, 255, 0.3);
+}
+
+select.form-input option {
+  background: #0f0f2a;
+  color: #fff;
+  border: none;
+}
+
+select.form-input option:checked {
+  background: #4a4a7e;
+  color: #fff;
 }
 
 /* Submit Button */

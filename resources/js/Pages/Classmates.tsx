@@ -1,7 +1,11 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// Types - simplified for Classmates (no birthday/mbti here)
+// Type definitions
+export type MbtiType = 'INTJ' | 'INTP' | 'ENTJ' | 'ENTP' | 'INFJ' | 'INFP' | 'ENFJ' | 'ENFP' | 'ISTJ' | 'ISFJ' | 'ESTJ' | 'ESFJ' | 'ISTP' | 'ISFP' | 'ESTP' | 'ESFP';
+export type DrinkType = 'Coffee' | 'Tea' | 'Soda' | 'Juice' | 'Water' | 'EnergyDrink' | 'Milk' | 'Smoothie';
+export type ZodiacType = 'Aries' | 'Taurus' | 'Gemini' | 'Cancer' | 'Leo' | 'Virgo' | 'Libra' | 'Scorpio' | 'Sagittarius' | 'Capricorn' | 'Aquarius' | 'Pisces';
+
 interface Badge {
   id: string;
   name: string;
@@ -17,11 +21,15 @@ interface Sticker {
   from?: string;
 }
 
-interface Classmate {
+export interface Classmate {
   id: string;
   fullName: string;
   nickname: string;
   photo: string;
+  birthday: string; // YYYY-MM-DD format
+  zodiac: ZodiacType;
+  mbti: MbtiType;
+  favoriteDrink: DrinkType;
   socialLinks: {
     instagram?: string;
   };
@@ -61,39 +69,47 @@ const STICKER_OPTIONS: Sticker[] = [
 // Placeholder avatar
 const PLACEHOLDER_AVATAR = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMjAwIDIwMCI+PHJlY3QgZmlsbD0iIzJhMmE0ZSIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiLz48dGV4dCB4PSI1MCUiIHk9IjU1JSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzg4ODhmZiIgZm9udC1zaXplPSI4MCI+8J+RpDwvdGV4dD48L3N2Zz4=';
 
-// Foto Nanas
-const NANAS_PHOTO = '/photos/nanas.jpeg';
-
-// Sample classmates data - hanya Nanas
-const INITIAL_CLASSMATES: Classmate[] = [
-  {
-    id: '1',
-    fullName: 'Zamira Nasywa U',
-    nickname: 'Nanas',
-    photo: NANAS_PHOTO,
-    socialLinks: { instagram: '@nasyviie' },
-    badges: [
-      { ...ALL_BADGES[4], unlocked: true }, // Social Butterfly
-      { ...ALL_BADGES[1], unlocked: true }, // Creative Soul
-    ],
-    stickersReceived: [
-      { id: '1', emoji: '💖', name: 'Love', from: 'Someone' },
-      { id: '5', emoji: '🌟', name: 'Sparkle', from: 'A friend' },
-    ],
-    playerNumber: 1,
-  },
-];
+// Sample classmates data dengan real MBTI, zodiac, dan drink
+const INITIAL_CLASSMATES: Classmate[] = [];
 
 export default function Classmates() {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
+  // Load initial data from localStorage or use INITIAL_CLASSMATES
+  const loadInitialClassmates = (): Classmate[] => {
+    try {
+      const saved = localStorage.getItem('classmates');
+      return saved ? JSON.parse(saved) : INITIAL_CLASSMATES;
+    } catch (e) {
+      console.error('Failed to load classmates:', e);
+      return INITIAL_CLASSMATES;
+    }
+  };
+
+  const loadInitialUserProfile = (): Classmate | null => {
+    try {
+      const saved = localStorage.getItem('userProfile');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      console.error('Failed to load user profile:', e);
+      return null;
+    }
+  };
+
   // State
-  const [classmates, setClassmates] = useState<Classmate[]>(INITIAL_CLASSMATES);
+  const [classmates, setClassmates] = useState<Classmate[]>(loadInitialClassmates);
+  const [userProfile, setUserProfile] = useState<Classmate | null>(loadInitialUserProfile);
   const [bffs, setBffs] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [showBffsOnly, setShowBffsOnly] = useState(false);
-  const [hasProfile, setHasProfile] = useState(false); // User belum punya profile
+  const [hasProfile, setHasProfile] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('hasProfile') === 'true';
+    } catch {
+      return false;
+    }
+  });
   
   // Modal states
   const [selectedPlayer, setSelectedPlayer] = useState<Classmate | null>(null);
@@ -105,12 +121,47 @@ export default function Classmates() {
   const [profileForm, setProfileForm] = useState({
     fullName: '',
     nickname: '',
+    birthday: '',
+    mbti: 'INTJ' as MbtiType,
+    zodiac: 'Aries' as ZodiacType,
+    favoriteDrink: 'Coffee' as DrinkType,
     instagram: '',
   });
   const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
   
   // Toast
   const [toast, setToast] = useState<{ message: string; emoji: string } | null>(null);
+
+  // Save classmates to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('classmates', JSON.stringify(classmates));
+    } catch (e) {
+      console.error('Failed to save classmates:', e);
+    }
+  }, [classmates]);
+
+  // Save user profile to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      if (userProfile) {
+        localStorage.setItem('userProfile', JSON.stringify(userProfile));
+      } else {
+        localStorage.removeItem('userProfile');
+      }
+    } catch (e) {
+      console.error('Failed to save user profile:', e);
+    }
+  }, [userProfile]);
+
+  // Save hasProfile flag to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('hasProfile', hasProfile ? 'true' : 'false');
+    } catch (e) {
+      console.error('Failed to save hasProfile flag:', e);
+    }
+  }, [hasProfile]);
 
   // Filter classmates
   const filteredClassmates = classmates.filter(c => {
@@ -201,8 +252,8 @@ export default function Classmates() {
 
   // Submit profile
   const handleSubmitProfile = () => {
-    if (!profileForm.fullName.trim() || !profileForm.nickname.trim()) {
-      showToast('Please fill in your name and nickname!', '❌');
+    if (!profileForm.fullName.trim() || !profileForm.nickname.trim() || !profileForm.birthday) {
+      showToast('Please fill in all required fields!', '❌');
       return;
     }
 
@@ -211,16 +262,21 @@ export default function Classmates() {
       fullName: profileForm.fullName.trim(),
       nickname: profileForm.nickname.trim(),
       photo: previewPhoto || '',
+      birthday: profileForm.birthday,
+      mbti: profileForm.mbti,
+      zodiac: profileForm.zodiac,
+      favoriteDrink: profileForm.favoriteDrink,
       socialLinks: { instagram: profileForm.instagram.trim() || undefined },
       badges: [],
       stickersReceived: [],
       playerNumber: classmates.length + 1,
     };
 
+    setUserProfile(newPlayer); // Store user's profile separately
     setClassmates(prev => [...prev, newPlayer]);
     setHasProfile(true);
     setShowProfileForm(false);
-    setProfileForm({ fullName: '', nickname: '', instagram: '' });
+    setProfileForm({ fullName: '', nickname: '', birthday: '', mbti: 'INTJ', zodiac: 'Aries', favoriteDrink: 'Coffee', instagram: '' });
     setPreviewPhoto(null);
     showToast('Welcome to the roster! 🎮', '✨');
   };
@@ -237,22 +293,32 @@ export default function Classmates() {
 
       {/* Header */}
       <header className="classmates-header">
-        <button className="back-btn" onClick={() => navigate('/dashboard')}>
-          ← BACK
-        </button>
-        <div className="header-title">
-          <h1>CLASSMATES</h1>
-          <p className="header-desc">View profiles • Unlock badges • Send stickers • Bookmark BFFs</p>
+        <div className="header-top">
+          <button className="back-btn" onClick={() => navigate('/dashboard')}>
+            ← BACK
+          </button>
+          <div className="header-title">
+            <h1>LEVEL 01: CLASS ROSTER</h1>
+            <p className="header-desc">Analyzing Student Profiles...</p>
+          </div>
+          <div className="header-stats">
+            <span className="stat-box">
+              <span className="stat-label">TOTAL</span>
+              <span className="stat-num">{classmates.length}</span>
+            </span>
+            <span className="stat-box">
+              <span className="stat-label">BFFs</span>
+              <span className="stat-num">{bffs.size}</span>
+            </span>
+          </div>
         </div>
-        <div className="header-stats">
-          <span className="stat-box">
-            <span className="stat-num">{classmates.length}</span>
-            <span className="stat-label">PLAYERS</span>
-          </span>
-          <span className="stat-box">
-            <span className="stat-num">{bffs.size}</span>
-            <span className="stat-label">BFFs</span>
-          </span>
+
+        {/* Loading Bar */}
+        <div className="loading-bar-container">
+          <div 
+            className="loading-bar-fill"
+            style={{ width: classmates.length > 0 ? '100%' : '20%' }}
+          />
         </div>
       </header>
 
@@ -272,24 +338,61 @@ export default function Classmates() {
           className={`filter-btn ${showBffsOnly ? 'active' : ''}`}
           onClick={() => setShowBffsOnly(!showBffsOnly)}
         >
-          {showBffsOnly ? '💝 BFFs Only' : '👥 All Players'}
+          {showBffsOnly ? '💝 BFFs ONLY' : '👥 ALL PLAYERS'}
         </button>
       </div>
 
-      {/* Warning: Add Your Profile */}
-      {!hasProfile && (
-        <div className="add-profile-warning">
-          <div className="warning-icon">⚠️</div>
-          <div className="warning-content">
-            <h3 className="warning-title">YOU'RE NOT IN THE ROSTER YET!</h3>
-            <p className="warning-text">Add your profile so your classmates can find you, send you stickers, and unlock badges for you!</p>
+      <div className="main-content">
+        {/* Warning: Add Your Profile */}
+        {!hasProfile && (
+          <div className="add-profile-warning">
+            <div className="warning-icon">⚠️</div>
+            <div className="warning-content">
+              <h3 className="warning-title">YOU'RE NOT IN THE ROSTER YET!</h3>
+              <p className="warning-text">Add your profile so your classmates can find you, send you stickers, and unlock badges for you!</p>
+            </div>
+            <button 
+              className="add-profile-btn"
+              onClick={() => setShowProfileForm(true)}
+            >
+              🎮 ADD YOUR PROFILE
+            </button>
           </div>
-          <button 
-            className="add-profile-btn"
-            onClick={() => setShowProfileForm(true)}
-          >
-            🎮 ADD YOUR PROFILE
-          </button>
+        )}
+
+      {/* Your Profile Card */}
+      {hasProfile && userProfile && (
+        <div className="your-profile-card">
+          <div className="your-profile-header">
+            <span className="your-profile-title">🎮 YOUR PROFILE</span>
+            <button 
+              className="edit-profile-btn"
+              onClick={() => setShowProfileForm(true)}
+              title="Edit Profile"
+            >
+              ✏️ EDIT
+            </button>
+          </div>
+          <div className="your-profile-content">
+            <div className="your-profile-info">
+              <h3 className="your-profile-name">{userProfile.nickname}</h3>
+              <p className="your-profile-fullname">{userProfile.fullName}</p>
+            </div>
+            <div className="your-profile-stats">
+              <div className="your-profile-stat">
+                <span className="stat-label">Zodiac</span>
+                <span className="stat-value">{userProfile.zodiac}</span>
+              </div>
+              <div className="your-profile-stat">
+                <span className="stat-label">MBTI</span>
+                <span className="stat-value">{userProfile.mbti}</span>
+              </div>
+              <div className="your-profile-stat">
+                <span className="stat-label">Favorite Drink</span>
+                <span className="stat-value">{userProfile.favoriteDrink}</span>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -608,6 +711,82 @@ export default function Classmates() {
               </div>
 
               <div className="form-group">
+                <label className="form-label">Birthday *</label>
+                <input
+                  type="date"
+                  className="form-input"
+                  value={profileForm.birthday}
+                  onChange={(e) => setProfileForm({ ...profileForm, birthday: e.target.value })}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Zodiac Sign *</label>
+                <select
+                  className="form-input"
+                  value={profileForm.zodiac}
+                  onChange={(e) => setProfileForm({ ...profileForm, zodiac: e.target.value as ZodiacType })}
+                >
+                  <option value="Aries">♈ Aries</option>
+                  <option value="Taurus">♉ Taurus</option>
+                  <option value="Gemini">♊ Gemini</option>
+                  <option value="Cancer">♋ Cancer</option>
+                  <option value="Leo">♌ Leo</option>
+                  <option value="Virgo">♍ Virgo</option>
+                  <option value="Libra">♎ Libra</option>
+                  <option value="Scorpio">♏ Scorpio</option>
+                  <option value="Sagittarius">♐ Sagittarius</option>
+                  <option value="Capricorn">♑ Capricorn</option>
+                  <option value="Aquarius">♒ Aquarius</option>
+                  <option value="Pisces">♓ Pisces</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">MBTI Type *</label>
+                <select
+                  className="form-input"
+                  value={profileForm.mbti}
+                  onChange={(e) => setProfileForm({ ...profileForm, mbti: e.target.value as MbtiType })}
+                >
+                  <option value="INTJ">INTJ</option>
+                  <option value="INTP">INTP</option>
+                  <option value="ENTJ">ENTJ</option>
+                  <option value="ENTP">ENTP</option>
+                  <option value="INFJ">INFJ</option>
+                  <option value="INFP">INFP</option>
+                  <option value="ENFJ">ENFJ</option>
+                  <option value="ENFP">ENFP</option>
+                  <option value="ISTJ">ISTJ</option>
+                  <option value="ISFJ">ISFJ</option>
+                  <option value="ESTJ">ESTJ</option>
+                  <option value="ESFJ">ESFJ</option>
+                  <option value="ISTP">ISTP</option>
+                  <option value="ISFP">ISFP</option>
+                  <option value="ESTP">ESTP</option>
+                  <option value="ESFP">ESFP</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Favorite Drink *</label>
+                <select
+                  className="form-input"
+                  value={profileForm.favoriteDrink}
+                  onChange={(e) => setProfileForm({ ...profileForm, favoriteDrink: e.target.value as DrinkType })}
+                >
+                  <option value="Coffee">☕ Coffee</option>
+                  <option value="Tea">🍵 Tea</option>
+                  <option value="Soda">🥤 Soda</option>
+                  <option value="Juice">🧃 Juice</option>
+                  <option value="Water">💧 Water</option>
+                  <option value="EnergyDrink">⚡ Energy Drink</option>
+                  <option value="Milk">🥛 Milk</option>
+                  <option value="Smoothie">🍹 Smoothie</option>
+                </select>
+              </div>
+
+              <div className="form-group">
                 <label className="form-label">Instagram (optional)</label>
                 <input
                   type="text"
@@ -629,6 +808,7 @@ export default function Classmates() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

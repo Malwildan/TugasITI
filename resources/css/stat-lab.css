@@ -1,0 +1,542 @@
+/* ========================================
+   STAT LAB PAGE STYLES
+   Retro-Arcade Statistics Dashboard
+======================================== */
+
+.stat-lab-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0d0d1a 0%, #1a0b2e 50%, #2d1b4e 100%);
+  padding: 2rem 1rem;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Scanlines Effect */
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.15) 2px,
+    rgba(0, 0, 0, 0.15) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ===== HEADER ===== */
+.stat-header {
+  max-width: 1400px;
+  margin: 0 auto 3rem;
+  background: linear-gradient(135deg, rgba(74, 58, 120, 0.4), rgba(88, 44, 131, 0.3));
+  border: 4px solid #000;
+  border-radius: 20px;
+  padding: 2rem;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.back-arcade-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  background: linear-gradient(180deg, #ff4444, #cc0000);
+  border: 3px solid #000;
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
+  text-transform: uppercase;
+}
+
+.back-arcade-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.5);
+}
+
+.back-arcade-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.header-text {
+  flex: 1;
+}
+
+.stat-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.8rem;
+  color: #fff;
+  text-shadow: 
+    0 0 10px rgba(255, 100, 255, 0.6),
+    0 0 20px rgba(100, 200, 255, 0.4),
+    2px 2px 0 #000;
+  margin: 0 0 0.5rem;
+  letter-spacing: 2px;
+}
+
+.stat-subtitle {
+  font-family: 'VT323', monospace;
+  font-size: 1.3rem;
+  color: #88ff88;
+  margin: 0;
+  text-shadow: 0 0 8px rgba(136, 255, 136, 0.5);
+}
+
+.header-stats-badges {
+  display: flex;
+  gap: 1rem;
+}
+
+.badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(180deg, #4a4a8e, #3a3a6e);
+  border: 3px solid #88aaff;
+  border-radius: 12px;
+  padding: 1rem;
+  min-width: 100px;
+  box-shadow: 
+    0 4px 0 rgba(0, 0, 0, 0.5),
+    0 0 15px rgba(136, 170, 255, 0.3);
+}
+
+.badge-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  color: #aaccff;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.badge-value {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.5rem;
+  color: #88ff88;
+  text-shadow: 0 0 10px rgba(136, 255, 136, 0.5);
+}
+
+/* Loading Bar */
+.loading-bar-container {
+  width: 100%;
+  height: 20px;
+  background: #000;
+  border: 2px solid #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.8);
+}
+
+.loading-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff6b9d, #4ecdc4, #ffd93d, #88ff88);
+  background-size: 200% 100%;
+  animation: gradientShift 2s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(255, 107, 157, 0.6);
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ===== WIDGETS GRID ===== */
+.widgets-grid {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  position: relative;
+  z-index: 10;
+}
+
+.widget {
+  background: linear-gradient(135deg, rgba(60, 30, 100, 0.6), rgba(40, 20, 80, 0.7));
+  border: 4px solid #000;
+  border-radius: 16px;
+  padding: 1.5rem;
+  position: relative;
+  box-shadow: 
+    0 8px 0 rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s;
+}
+
+.widget:hover {
+  transform: translateY(-5px);
+  box-shadow: 
+    0 12px 0 rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 30px rgba(136, 255, 136, 0.2);
+}
+
+.widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 3px dashed #888;
+}
+
+.widget-header h2 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1rem;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 100, 255, 0.5);
+  margin: 0;
+}
+
+.widget-label {
+  font-family: 'VT323', monospace;
+  font-size: 0.9rem;
+  color: #aaccff;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #4a7aff;
+}
+
+/* ===== WIDGET 1: VENDING MACHINE ===== */
+.vending-machine {
+  grid-column: 1;
+}
+
+.vending-glass {
+  background: linear-gradient(135deg, rgba(20, 20, 40, 0.8), rgba(10, 10, 20, 0.9));
+  border: 3px solid #4a90e2;
+  border-radius: 12px;
+  padding: 1.5rem 1rem;
+  box-shadow: inset 0 0 20px rgba(74, 144, 226, 0.2);
+}
+
+.drinks-shelf {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 1.5rem;
+}
+
+.drink-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(40, 40, 80, 0.6);
+  border: 2px solid #6a6a9e;
+  border-radius: 10px;
+  padding: 1rem 0.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.drink-item:hover {
+  background: rgba(60, 60, 100, 0.8);
+  border-color: #88aaff;
+}
+
+.drink-emoji {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.drink-name {
+  font-family: 'VT323', monospace;
+  font-size: 0.9rem;
+  color: #fff;
+  margin: 0 0 0.5rem;
+}
+
+.stock-bar {
+  width: 100%;
+  height: 16px;
+  background: #000;
+  border: 1px solid #4a4a7e;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0.5rem 0;
+}
+
+.stock-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff6b9d, #ff8855);
+  transition: width 0.6s ease-out;
+}
+
+.stock-count {
+  font-family: 'VT323', monospace;
+  font-size: 0.75rem;
+  color: #88ff88;
+}
+
+/* ===== WIDGET 2: CHARACTER CLASSES ===== */
+.mbti-classes {
+  grid-column: 2;
+}
+
+.classes-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.class-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.class-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  min-width: 100px;
+  text-shadow: 0 0 8px currentColor;
+}
+
+.health-bar {
+  flex: 1;
+  height: 24px;
+  background: #000;
+  border: 2px solid #4a4a7e;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.8);
+}
+
+.health-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff6b9d, #ff8855);
+  transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.class-count {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.8rem;
+  color: #88ff88;
+  min-width: 30px;
+  text-align: right;
+}
+
+/* ===== WIDGET 3: COSMIC ALIGNMENT ===== */
+.cosmic-alignment {
+  grid-column: 1;
+}
+
+.zodiac-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+}
+
+.zodiac-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, rgba(20, 20, 40, 0.8), rgba(10, 10, 20, 0.9));
+  border: 2px solid;
+  border-radius: 10px;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+}
+
+.zodiac-item:hover {
+  transform: scale(1.1);
+}
+
+.zodiac-sign {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: 0.3rem;
+  filter: brightness(1.2);
+}
+
+.zodiac-count {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  color: #88ff88;
+}
+
+/* ===== WIDGET 4: SPAWN DATES ===== */
+.spawn-dates {
+  grid-column: 2;
+}
+
+.birthmonth-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.chart-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5rem;
+  height: 200px;
+  background: linear-gradient(180deg, rgba(60, 60, 100, 0.2), rgba(40, 40, 80, 0.2));
+  border: 2px solid #4a4a7e;
+  border-radius: 10px;
+  padding: 1rem 0.5rem;
+}
+
+.month-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  position: relative;
+}
+
+.bar-fill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #ffd93d, #ffb347);
+  border: 2px solid #000;
+  border-radius: 4px 4px 0 0;
+  box-shadow: 0 0 15px rgba(255, 217, 61, 0.4);
+  position: relative;
+}
+
+.bar-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: #000;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+.chart-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.month-label {
+  font-family: 'VT323', monospace;
+  font-size: 0.8rem;
+  color: #aaccff;
+  text-align: center;
+  flex: 1;
+}
+
+/* ===== FOOTER ===== */
+.stat-footer {
+  max-width: 1400px;
+  margin: 3rem auto 0;
+  display: flex;
+  justify-content: space-around;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(74, 58, 120, 0.4), rgba(88, 44, 131, 0.3));
+  border: 4px solid #000;
+  border-radius: 16px;
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 10;
+}
+
+.footer-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer-stat .stat-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  color: #aaccff;
+}
+
+.footer-stat .stat-value {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.3rem;
+  color: #88ff88;
+  text-shadow: 0 0 10px rgba(136, 255, 136, 0.5);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .widgets-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .widget {
+    grid-column: unset !important;
+  }
+
+  .stat-title {
+    font-size: 1.3rem;
+  }
+
+  .header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .stat-footer {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .stat-lab-page {
+    padding: 1rem 0.5rem;
+  }
+
+  .stat-header {
+    padding: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-title {
+    font-size: 1rem;
+  }
+
+  .stat-subtitle {
+    font-size: 1rem;
+  }
+
+  .widgets-grid {
+    gap: 1.5rem;
+  }
+
+  .widget {
+    padding: 1rem;
+  }
+
+  .zodiac-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .vending-machine .drinks-shelf {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
