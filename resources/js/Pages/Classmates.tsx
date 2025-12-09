@@ -217,9 +217,9 @@ export default function Classmates() {
       
       showToast(`Unlocked ${badge.icon} for ${selectedPlayer.nickname}!`, '🔓');
       setShowBadgePicker(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error unlocking badge:', error);
-      showToast('Failed to unlock badge', '❌');
+      showToast(`Failed to unlock badge: ${error.message}`, '❌');
     }
   };
 
@@ -284,9 +284,9 @@ export default function Classmates() {
       setProfileForm({ fullName: '', nickname: '', birthday: '', mbti: 'INTJ', zodiac: 'Aries', favoriteDrink: 'Coffee', instagram: '' });
       setPreviewPhoto(null);
       showToast('Welcome to the roster! 🎮', '✨');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting profile:', error);
-      showToast('Failed to create profile', '❌');
+      showToast(`Failed to create profile: ${error.message || 'Unknown error'}\nCheck 'avatars' bucket!`, '❌');
     } finally {
       setIsLoading(false);
     }

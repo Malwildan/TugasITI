@@ -128,9 +128,9 @@ export default function MemoryReel() {
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error adding memory:', error);
-        alert('Failed to add memory. Please try again.');
+        alert(`Failed to add memory: ${error.message || 'Unknown error'}\n\nMake sure you have created the 'memories' storage bucket in Supabase!`);
       } finally {
         setIsLoading(false);
       }
@@ -187,9 +187,9 @@ export default function MemoryReel() {
         setEditMemory(null);
         setEditCaption('');
         setEditDate('');
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error editing memory:', error);
-        alert('Failed to edit memory. Please try again.');
+        alert(`Failed to edit memory: ${error.message || 'Unknown error'}`);
       }
     }
   };
@@ -201,9 +201,9 @@ export default function MemoryReel() {
         await deleteMemory(memoryId);
         setMemories(prev => prev.filter(mem => mem.id !== memoryId));
         closeLightbox();
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error deleting memory:', error);
-        alert('Failed to delete memory. Please try again.');
+        alert(`Failed to delete memory: ${error.message || 'Unknown error'}`);
       }
     }
   };
@@ -220,9 +220,9 @@ export default function MemoryReel() {
           audioRef.current.play().catch(err => console.error('Error playing BGM:', err));
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving BGM:', error);
-      alert('Failed to save BGM settings.');
+      alert(`Failed to save BGM settings: ${error.message || 'Unknown error'}`);
     }
   };
 
