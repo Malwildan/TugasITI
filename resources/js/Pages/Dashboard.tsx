@@ -25,7 +25,7 @@ export default function Dashboard() {
             <span className="hud-blink">INSERT COIN PLEASE</span>
           </div>
         </div>
-        <button className="hud-ready-btn">READY?</button>
+        <button onClick={handleLogout} className="hud-ready-btn">LOGOUT?</button>
       </div>
 
       {/* Main Content Card */}
@@ -130,15 +130,9 @@ export default function Dashboard() {
           <div className="dashboard-footer-bar">
             <div className="dashboard-footer-progress">
               <div className="footer-progress-track">
-                <div className="footer-progress-fill" />
+                <div className="footer-progress-fill"/>
               </div>
             </div>
-          </div>
-
-          {/* Bottom Actions */}
-          <div className="dashboard-actions">
-            <button onClick={handleLogout} className="dashboard-exit-btn">EXIT</button>
-            <span className="dashboard-coins">COINS READY</span>
           </div>
         </div>
       </div>
