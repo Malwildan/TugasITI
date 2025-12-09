@@ -432,7 +432,7 @@ export async function updateUserSettings(settings: { bgmUrl?: string; bgmVolume?
 
 // === STORAGE ===
 
-export async function uploadFile(bucket: 'avatars' | 'memories', file: File, path?: string): Promise<string> {
+export async function uploadFile(bucket: 'avatars' | 'memories' | 'bgm', file: File, path?: string): Promise<string> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 

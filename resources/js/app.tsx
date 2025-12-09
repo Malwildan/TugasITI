@@ -5,8 +5,8 @@ import '../css/memory-reel.css';
 import '@/lib/route'; // Initialize route() shim globally
 import { createRoot } from 'react-dom/client';
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
-import { AuthProvider, ProtectedRoute } from '@/lib/auth';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from '@/lib/auth';
 
 // Pages
 import Dashboard from './Pages/Dashboard';
@@ -22,6 +22,7 @@ import VerifyEmail from './Pages/Auth/VerifyEmail';
 import ConfirmPassword from './Pages/Auth/ConfirmPassword';
 import ProfileEdit from './Pages/Profile/Edit';
 import SumGame from './Pages/SumGame';
+import AuthenticatedLayoutWrapper from './Layouts/AuthenticatedLayoutWrapper';
 
 function App() {
     return (
@@ -44,71 +45,25 @@ function App() {
                     <Route path="/confirm-password" element={<ConfirmPassword />} />
                     <Route path="/welcome" element={<Continue />} />
 
-                    {/* Protected */}
-                    <Route
-                        path="/sum-game"
-                        element={
-                            <ProtectedRoute>
-                                <SumGame />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/dashboard"
-                        element={
-                            <ProtectedRoute>
-                                <Dashboard />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/classmates"
-                        element={
-                            <ProtectedRoute>
-                                <Classmates />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/stat-lab"
-                        element={
-                            <ProtectedRoute>
-                                <StatLab />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/memory-reel"
-                        element={
-                            <ProtectedRoute>
-                                <MemoryReel />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/continue"
-                        element={
-                            <ProtectedRoute>
-                                <Continue />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/profile/edit"
-                        element={
-                            <ProtectedRoute>
-                                {
-                                    (
-                                        <ProfileEdit
-                                            auth={{ user: {} as any }}
-                                            mustVerifyEmail={false}
-                                            status={undefined}
-                                        />
-                                    ) as any
-                                }
-                            </ProtectedRoute>
-                        }
-                    />
+                    {/* Protected Routes with Global BGM */}
+                    <Route element={<AuthenticatedLayoutWrapper />}>
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/classmates" element={<Classmates />} />
+                        <Route path="/stat-lab" element={<StatLab />} />
+                        <Route path="/memory-reel" element={<MemoryReel />} />
+                        <Route path="/sum-game" element={<SumGame />} />
+                        <Route path="/continue" element={<Continue />} />
+                        <Route 
+                            path="/profile" 
+                            element={
+                                <ProfileEdit 
+                                    mustVerifyEmail={false} 
+                                    status={undefined} 
+                                    auth={{ user: { id: 0, name: 'User', email: 'user@example.com' } }} 
+                                />
+                            } 
+                        />
+                    </Route>
 
                     {/* Fallback */}
                     <Route path="*" element={<Navigate to="/" replace />} />

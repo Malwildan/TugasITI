@@ -18,13 +18,13 @@ const TAPE_COLORS = ['#ff6b9d', '#4ecdc4', '#ffaa44', '#88ff88', '#4a7aff'];
 export default function MemoryReel() {
   const navigate = useNavigate();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // State Management
   const [memories, setMemories] = useState<Memory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(false);
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [newMemory, setNewMemory] = useState({ caption: '', date: new Date().toISOString().split('T')[0], file: null as File | null });
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -40,11 +40,7 @@ export default function MemoryReel() {
   const [editCaption, setEditCaption] = useState('');
   const [editDate, setEditDate] = useState('');
   
-  // BGM State
-  const [bgmUrl, setBgmUrl] = useState<string>('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
-  const [showBgmModal, setShowBgmModal] = useState(false);
-  const [bgmInput, setBgmInput] = useState(bgmUrl);
-  const [bgmVolume, setBgmVolume] = useState<number>(0.5);
+
 
   // Get random tape color
   const getRandomTapeColor = () => TAPE_COLORS[Math.floor(Math.random() * TAPE_COLORS.length)];
@@ -52,26 +48,7 @@ export default function MemoryReel() {
   // Get random tilt
   const getRandomTilt = () => Math.random() * 6 - 3;
 
-  // Handle play/pause
-  const togglePlay = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
 
-  // Handle next track
-  const handleNextTrack = () => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play();
-      setIsPlaying(true);
-    }
-  };
 
   // Handle image upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -208,48 +185,9 @@ export default function MemoryReel() {
     }
   };
 
-  // Handle BGM save
-  const handleSaveBgm = async () => {
-    try {
-      await updateUserSettings({ bgmUrl: bgmInput });
-      setBgmUrl(bgmInput);
-      setShowBgmModal(false);
-      if (audioRef.current) {
-        audioRef.current.src = bgmInput;
-        if (isPlaying) {
-          audioRef.current.play().catch(err => console.error('Error playing BGM:', err));
-        }
-      }
-    } catch (error: any) {
-      console.error('Error saving BGM:', error);
-      alert(`Failed to save BGM settings: ${error.message || 'Unknown error'}`);
-    }
-  };
 
-  // Handle BGM volume change
-  const handleVolumeChange = async (newVolume: number) => {
-    setBgmVolume(newVolume);
-    if (audioRef.current) {
-      audioRef.current.volume = newVolume;
-    }
-    try {
-      await updateUserSettings({ bgmVolume: newVolume });
-    } catch (error) {
-      console.error('Error saving volume:', error);
-    }
-  };
 
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (audio) {
-      const handleEnded = () => setIsPlaying(false);
-      audio.addEventListener('ended', handleEnded);
-      audio.src = bgmUrl;
-      audio.volume = bgmVolume;
-      audio.loop = true;
-      return () => audio.removeEventListener('ended', handleEnded);
-    }
-  }, []);
+
 
   // Load memories and settings from Supabase on mount
   useEffect(() => {
@@ -269,15 +207,7 @@ export default function MemoryReel() {
           rotation: m.rotation,
         })));
         
-        // Fetch settings
-        const settings = await fetchUserSettings();
-        if (settings) {
-          if (settings.bgm_url) {
-            setBgmUrl(settings.bgm_url);
-            setBgmInput(settings.bgm_url);
-          }
-          setBgmVolume(settings.bgm_volume);
-        }
+
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
@@ -418,49 +348,7 @@ export default function MemoryReel() {
         <div className="sprocket-holes bottom" />
       </div>
 
-      {/* Mini Walkman Player */}
-      <motion.div
-        className="mini-walkman"
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.3 }}
-      >
-        <div className="walkman-screen">
-          <motion.div
-            className="walkman-wheels"
-            animate={isPlaying ? { rotate: 360 } : { rotate: 0 }}
-            transition={
-              isPlaying
-                ? { duration: 0.8, repeat: Infinity, ease: 'linear' }
-                : { duration: 0.3 }
-            }
-          >
-            ●●
-          </motion.div>
-        </div>
 
-        <div className="walkman-controls">
-          <motion.button
-            className="walkman-btn"
-            onClick={togglePlay}
-            whileHover={{ scale: 1.15 }}
-            whileTap={{ scale: 0.85 }}
-            title={bgmUrl ? 'Play/Pause BGM' : 'Set BGM first'}
-            disabled={!bgmUrl}
-          >
-            {isPlaying ? '⏸' : '▶'}
-          </motion.button>
-          <motion.button
-            className="walkman-btn"
-            onClick={() => setShowBgmModal(true)}
-            whileHover={{ scale: 1.15 }}
-            whileTap={{ scale: 0.85 }}
-            title="Set BGM"
-          >
-            🎵
-          </motion.button>
-        </div>
-      </motion.div>
 
       {/* Add Memory Modal */}
       {showAddModal && (
@@ -723,94 +611,9 @@ export default function MemoryReel() {
         )}
       </AnimatePresence>
 
-      {/* BGM MODAL */}
-      <AnimatePresence>
-        {showBgmModal && (
-          <motion.div
-            className="memory-modal-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={() => setShowBgmModal(false)}
-          >
-            <motion.div
-              className="memory-modal-box"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.2, type: 'spring', stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                className="modal-close-btn"
-                onClick={() => setShowBgmModal(false)}
-              >
-                ✕
-              </button>
 
-              <h2 className="modal-title">🎵 SET BGM</h2>
 
-              {/* BGM URL Input */}
-              <div className="modal-form">
-                <div className="form-group">
-                  <label className="form-label">Audio URL</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    placeholder="Paste audio URL (mp3, wav, etc)"
-                    value={bgmInput}
-                    onChange={(e) => setBgmInput(e.target.value)}
-                  />
-                  <p className="form-hint">
-                    Gunakan URL langsung ke file audio MP3 (contoh: https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3)
-                  </p>
-                </div>
 
-                {/* Volume Control */}
-                <div className="form-group">
-                  <label className="form-label">Volume</label>
-                  <div className="volume-control">
-                    <span className="volume-icon">🔊</span>
-                    <input
-                      type="range"
-                      className="volume-slider"
-                      min="0"
-                      max="1"
-                      step="0.1"
-                      value={bgmVolume}
-                      onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-                    />
-                    <span className="volume-percent">{Math.round(bgmVolume * 100)}%</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Buttons */}
-              <div className="modal-actions">
-                <motion.button
-                  className="modal-submit-btn"
-                  onClick={handleSaveBgm}
-                  disabled={!bgmInput.trim()}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  💾 SAVE BGM
-                </motion.button>
-              </div>
-
-              {bgmUrl && (
-                <div className="form-hint" style={{ marginTop: '1rem', textAlign: 'center', color: '#4ecdc4' }}>
-                  ✓ BGM tersimpan
-                </div>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Audio Element */}
-      <audio ref={audioRef} />
     </div>
   );
 }
