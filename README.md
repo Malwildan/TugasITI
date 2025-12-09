@@ -29,15 +29,33 @@ Outputs to `dist/`.
  - You can remove remaining PHP-specific files if any are left-over.
 
 ## Supabase Setup
-1. Create a project at https://supabase.com and copy your Project URL and anon public key.
-2. Add them to `.env` (create if missing) using:
-	```env
-	VITE_SUPABASE_URL=your_project_url
-	VITE_SUPABASE_ANON_KEY=your_anon_key
-	```
-3. Use the client from `resources/js/lib/supabase.ts`:
-	```ts
-	import { supabase } from '@/lib/supabase';
-	const { data, error } = await supabase.from('profiles').select('*');
-	```
-4. For auth, use `supabase.auth.signUp`, `signInWithPassword`, `signOut` and protect routes via React Router.
+
+**This project now uses Supabase as the backend database instead of localStorage.**
+
+### Quick Setup
+1. Create a project at https://supabase.com
+2. Run the database schema from `database/schema.sql` in Supabase SQL Editor
+3. Create storage buckets: `avatars` and `memories`
+4. Add your credentials to `.env`:
+   ```env
+   VITE_SUPABASE_URL=https://your-project.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-anon-key-here
+   ```
+5. Restart dev server: `npm run dev`
+
+### Detailed Instructions
+See [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) for complete setup guide including:
+- Database schema installation
+- Storage bucket configuration
+- RLS policies
+- Troubleshooting tips
+
+### Features Using Supabase
+- **Authentication**: Sign up, login, protected routes
+- **Profiles**: User profiles with MBTI, zodiac, favorite drinks
+- **Badges & Stickers**: Social features between users
+- **Memory Reel**: Photo/video uploads with captions
+- **Favorites**: BFF system to bookmark favorite classmates
+- **Settings**: Persistent BGM and volume preferences
+
+All data previously stored in localStorage is now persisted to Supabase.

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { fetchMemories, addMemory, updateMemory, deleteMemory, fetchUserSettings, updateUserSettings, uploadFile } from '@/lib/supabase-data';
 
 interface Memory {
   id: string;
@@ -14,25 +15,15 @@ interface Memory {
 
 const TAPE_COLORS = ['#ff6b9d', '#4ecdc4', '#ffaa44', '#88ff88', '#4a7aff'];
 
-// LocalStorage key untuk menyimpan memories
-const MEMORIES_STORAGE_KEY = 'memoryReel_memories';
-
 export default function MemoryReel() {
   const navigate = useNavigate();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // State Management - Load dari localStorage
-  const [memories, setMemories] = useState<Memory[]>(() => {
-    try {
-      const stored = localStorage.getItem(MEMORIES_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
-    } catch (error) {
-      console.error('Error loading memories from localStorage:', error);
-      return [];
-    }
-  });
+  // State Management
+  const [memories, setMemories] = useState<Memory[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newMemory, setNewMemory] = useState({ caption: '', date: new Date().toISOString().split('T')[0], file: null as File | null });
@@ -50,22 +41,10 @@ export default function MemoryReel() {
   const [editDate, setEditDate] = useState('');
   
   // BGM State
-  const [bgmUrl, setBgmUrl] = useState<string>(() => {
-    try {
-      return localStorage.getItem('memoryReel_bgm') || 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
-    } catch {
-      return 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
-    }
-  });
+  const [bgmUrl, setBgmUrl] = useState<string>('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
   const [showBgmModal, setShowBgmModal] = useState(false);
   const [bgmInput, setBgmInput] = useState(bgmUrl);
-  const [bgmVolume, setBgmVolume] = useState<number>(() => {
-    try {
-      return parseFloat(localStorage.getItem('memoryReel_bgmVolume') || '0.5');
-    } catch {
-      return 0.5;
-    }
-  });
+  const [bgmVolume, setBgmVolume] = useState<number>(0.5);
 
   // Get random tape color
   const getRandomTapeColor = () => TAPE_COLORS[Math.floor(Math.random() * TAPE_COLORS.length)];
@@ -111,32 +90,49 @@ export default function MemoryReel() {
   };
 
   // Handle add memory with real file data
-  const handleAddMemory = () => {
+  const handleAddMemory = async () => {
     if (previewImage && newMemory.caption.trim() && newMemory.file) {
-      // Create object URL from file for persistent access
-      const objectUrl = URL.createObjectURL(newMemory.file);
-      
-      const memory: Memory = {
-        id: `mem-${Date.now()}`,
-        type: newMemory.file.type.startsWith('video') ? 'video' : 'image',
-        src: objectUrl,
-        caption: newMemory.caption,
-        date: newMemory.date,
-        isNew: true,
-        rotation: getRandomTilt(),
-      };
-      
-      // Prepend new memory to the beginning
-      setMemories(prev => [memory, ...prev]);
-      
-      // Reset form
-      setShowAddModal(false);
-      setNewMemory({ caption: '', date: new Date().toISOString().split('T')[0], file: null });
-      setPreviewImage(null);
-      
-      // Reset file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+      try {
+        setIsLoading(true);
+        
+        // Upload file to Supabase storage
+        const mediaUrl = await uploadFile('memories', newMemory.file);
+        
+        // Add memory to database
+        const dbMemory = await addMemory({
+          type: newMemory.file.type.startsWith('video') ? 'video' : 'image',
+          mediaUrl,
+          caption: newMemory.caption,
+          date: newMemory.date,
+          rotation: getRandomTilt(),
+        });
+        
+        // Add to local state
+        const memory: Memory = {
+          id: dbMemory.id,
+          type: dbMemory.type,
+          src: dbMemory.media_url,
+          caption: dbMemory.caption || '',
+          date: dbMemory.memory_date,
+          isNew: dbMemory.is_new,
+          rotation: dbMemory.rotation,
+        };
+        
+        setMemories(prev => [memory, ...prev]);
+        
+        // Reset form
+        setShowAddModal(false);
+        setNewMemory({ caption: '', date: new Date().toISOString().split('T')[0], file: null });
+        setPreviewImage(null);
+        
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      } catch (error) {
+        console.error('Error adding memory:', error);
+        alert('Failed to add memory. Please try again.');
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -171,34 +167,51 @@ export default function MemoryReel() {
   };
 
   // Handle edit memory
-  const handleEditMemory = () => {
+  const handleEditMemory = async () => {
     if (editMemory && editCaption.trim()) {
-      setMemories(prev =>
-        prev.map(mem =>
-          mem.id === editMemory.id
-            ? { ...mem, caption: editCaption, date: editDate }
-            : mem
-        )
-      );
-      setShowEditModal(false);
-      setEditMemory(null);
-      setEditCaption('');
-      setEditDate('');
+      try {
+        await updateMemory(editMemory.id, {
+          caption: editCaption,
+          memory_date: editDate,
+        });
+        
+        setMemories(prev =>
+          prev.map(mem =>
+            mem.id === editMemory.id
+              ? { ...mem, caption: editCaption, date: editDate }
+              : mem
+          )
+        );
+        
+        setShowEditModal(false);
+        setEditMemory(null);
+        setEditCaption('');
+        setEditDate('');
+      } catch (error) {
+        console.error('Error editing memory:', error);
+        alert('Failed to edit memory. Please try again.');
+      }
     }
   };
 
   // Handle delete memory
-  const handleDeleteMemory = (memoryId: string) => {
+  const handleDeleteMemory = async (memoryId: string) => {
     if (confirm('Apakah kamu yakin ingin menghapus memory ini?')) {
-      setMemories(prev => prev.filter(mem => mem.id !== memoryId));
-      closeLightbox();
+      try {
+        await deleteMemory(memoryId);
+        setMemories(prev => prev.filter(mem => mem.id !== memoryId));
+        closeLightbox();
+      } catch (error) {
+        console.error('Error deleting memory:', error);
+        alert('Failed to delete memory. Please try again.');
+      }
     }
   };
 
   // Handle BGM save
-  const handleSaveBgm = () => {
+  const handleSaveBgm = async () => {
     try {
-      localStorage.setItem('memoryReel_bgm', bgmInput);
+      await updateUserSettings({ bgmUrl: bgmInput });
       setBgmUrl(bgmInput);
       setShowBgmModal(false);
       if (audioRef.current) {
@@ -209,19 +222,20 @@ export default function MemoryReel() {
       }
     } catch (error) {
       console.error('Error saving BGM:', error);
+      alert('Failed to save BGM settings.');
     }
   };
 
   // Handle BGM volume change
-  const handleVolumeChange = (newVolume: number) => {
+  const handleVolumeChange = async (newVolume: number) => {
     setBgmVolume(newVolume);
-    try {
-      localStorage.setItem('memoryReel_bgmVolume', newVolume.toString());
-    } catch (error) {
-      console.error('Error saving volume:', error);
-    }
     if (audioRef.current) {
       audioRef.current.volume = newVolume;
+    }
+    try {
+      await updateUserSettings({ bgmVolume: newVolume });
+    } catch (error) {
+      console.error('Error saving volume:', error);
     }
   };
 
@@ -237,14 +251,42 @@ export default function MemoryReel() {
     }
   }, []);
 
-  // Save memories to localStorage whenever they change
+  // Load memories and settings from Supabase on mount
   useEffect(() => {
-    try {
-      localStorage.setItem(MEMORIES_STORAGE_KEY, JSON.stringify(memories));
-    } catch (error) {
-      console.error('Error saving memories to localStorage:', error);
-    }
-  }, [memories]);
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Fetch memories
+        const dbMemories = await fetchMemories();
+        setMemories(dbMemories.map(m => ({
+          id: m.id,
+          type: m.type,
+          src: m.media_url,
+          caption: m.caption || '',
+          date: m.memory_date,
+          isNew: m.is_new,
+          rotation: m.rotation,
+        })));
+        
+        // Fetch settings
+        const settings = await fetchUserSettings();
+        if (settings) {
+          if (settings.bgm_url) {
+            setBgmUrl(settings.bgm_url);
+            setBgmInput(settings.bgm_url);
+          }
+          setBgmVolume(settings.bgm_volume);
+        }
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadData();
+  }, []);
 
   return (
     <div className="memory-reel-page">

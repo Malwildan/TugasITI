@@ -2,17 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Classmate } from './Classmates';
-
-// Load classmates data from localStorage
-const loadClassmatesData = (): Classmate[] => {
-  try {
-    const saved = localStorage.getItem('classmates');
-    return saved ? JSON.parse(saved) : [];
-  } catch (e) {
-    console.error('Failed to load classmates:', e);
-    return [];
-  }
-};
+import { fetchAllProfiles } from '@/lib/supabase-data';
 
 const DRINKS = [
   { name: 'Coffee', emoji: '☕', color: '#8B4513' },
@@ -85,8 +75,24 @@ const calculateStats = (classmates: Classmate[]) => {
 export default function StatLab() {
   const navigate = useNavigate();
   
-  // Load classmates data from localStorage
-  const [classmates, setClassmates] = useState<Classmate[]>(() => loadClassmatesData());
+  const [classmates, setClassmates] = useState<Classmate[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load classmates data from Supabase
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        const profiles = await fetchAllProfiles();
+        setClassmates(profiles);
+      } catch (error) {
+        console.error('Error loading profiles:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadData();
+  }, []);
 
   // Recalculate stats whenever classmates data changes
   const stats = useMemo(() => calculateStats(classmates), [classmates]);

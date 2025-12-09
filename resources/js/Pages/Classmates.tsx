@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { fetchAllProfiles, fetchCurrentUserProfile, upsertProfile, unlockBadge as dbUnlockBadge, sendSticker as dbSendSticker, fetchFavorites, toggleFavorite as dbToggleFavorite, uploadFile } from '@/lib/supabase-data';
 
 // Type definitions
 export type MbtiType = 'INTJ' | 'INTP' | 'ENTJ' | 'ENTP' | 'INFJ' | 'INFP' | 'ENFJ' | 'ENFP' | 'ISTJ' | 'ISFJ' | 'ESTJ' | 'ESFJ' | 'ISTP' | 'ISFP' | 'ESTP' | 'ESFP';
@@ -76,40 +77,14 @@ export default function Classmates() {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Load initial data from localStorage or use INITIAL_CLASSMATES
-  const loadInitialClassmates = (): Classmate[] => {
-    try {
-      const saved = localStorage.getItem('classmates');
-      return saved ? JSON.parse(saved) : INITIAL_CLASSMATES;
-    } catch (e) {
-      console.error('Failed to load classmates:', e);
-      return INITIAL_CLASSMATES;
-    }
-  };
-
-  const loadInitialUserProfile = (): Classmate | null => {
-    try {
-      const saved = localStorage.getItem('userProfile');
-      return saved ? JSON.parse(saved) : null;
-    } catch (e) {
-      console.error('Failed to load user profile:', e);
-      return null;
-    }
-  };
-
   // State
-  const [classmates, setClassmates] = useState<Classmate[]>(loadInitialClassmates);
-  const [userProfile, setUserProfile] = useState<Classmate | null>(loadInitialUserProfile);
+  const [classmates, setClassmates] = useState<Classmate[]>([]);
+  const [userProfile, setUserProfile] = useState<Classmate | null>(null);
   const [bffs, setBffs] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [showBffsOnly, setShowBffsOnly] = useState(false);
-  const [hasProfile, setHasProfile] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem('hasProfile') === 'true';
-    } catch {
-      return false;
-    }
-  });
+  const [hasProfile, setHasProfile] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Modal states
   const [selectedPlayer, setSelectedPlayer] = useState<Classmate | null>(null);
@@ -132,36 +107,28 @@ export default function Classmates() {
   // Toast
   const [toast, setToast] = useState<{ message: string; emoji: string } | null>(null);
 
-  // Save classmates to localStorage whenever it changes
+  // Load data from Supabase on mount
   useEffect(() => {
-    try {
-      localStorage.setItem('classmates', JSON.stringify(classmates));
-    } catch (e) {
-      console.error('Failed to save classmates:', e);
-    }
-  }, [classmates]);
-
-  // Save user profile to localStorage whenever it changes
-  useEffect(() => {
-    try {
-      if (userProfile) {
-        localStorage.setItem('userProfile', JSON.stringify(userProfile));
-      } else {
-        localStorage.removeItem('userProfile');
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        const [profiles, currentUser, favoriteIds] = await Promise.all([
+          fetchAllProfiles(),
+          fetchCurrentUserProfile(),
+          fetchFavorites(),
+        ]);
+        setClassmates(profiles);
+        setUserProfile(currentUser);
+        setHasProfile(!!currentUser);
+        setBffs(new Set(favoriteIds));
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (e) {
-      console.error('Failed to save user profile:', e);
-    }
-  }, [userProfile]);
-
-  // Save hasProfile flag to localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem('hasProfile', hasProfile ? 'true' : 'false');
-    } catch (e) {
-      console.error('Failed to save hasProfile flag:', e);
-    }
-  }, [hasProfile]);
+    };
+    loadData();
+  }, []);
 
   // Filter classmates
   const filteredClassmates = classmates.filter(c => {
@@ -178,64 +145,82 @@ export default function Classmates() {
   };
 
   // Toggle BFF
-  const toggleBff = (id: string, nickname: string) => {
-    const newBffs = new Set(bffs);
-    if (newBffs.has(id)) {
-      newBffs.delete(id);
-      showToast(`${nickname} removed from BFFs`, '💔');
-    } else {
-      newBffs.add(id);
-      showToast(`${nickname} added to BFFs!`, '💝');
+  const toggleBff = async (id: string, nickname: string) => {
+    try {
+      const isFavorited = await dbToggleFavorite(id);
+      const newBffs = new Set(bffs);
+      if (isFavorited) {
+        newBffs.add(id);
+        showToast(`${nickname} added to BFFs!`, '💝');
+      } else {
+        newBffs.delete(id);
+        showToast(`${nickname} removed from BFFs`, '💔');
+      }
+      setBffs(newBffs);
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      showToast('Failed to update BFFs', '❌');
     }
-    setBffs(newBffs);
   };
 
   // Send sticker to player
-  const sendSticker = (sticker: Sticker) => {
+  const sendSticker = async (sticker: Sticker) => {
     if (!selectedPlayer) return;
     
-    const newSticker = { ...sticker, from: 'You' };
-    setClassmates(prev => prev.map(c => 
-      c.id === selectedPlayer.id 
-        ? { ...c, stickersReceived: [...c.stickersReceived, newSticker] }
-        : c
-    ));
-    
-    // Update selected player view
-    setSelectedPlayer(prev => prev ? {
-      ...prev,
-      stickersReceived: [...prev.stickersReceived, newSticker]
-    } : null);
-    
-    showToast(`Sent ${sticker.emoji} to ${selectedPlayer.nickname}!`, '🎁');
-    setShowStickerPicker(false);
+    try {
+      await dbSendSticker(selectedPlayer.id, sticker.id);
+      
+      const newSticker = { ...sticker, from: 'You' };
+      setClassmates(prev => prev.map(c => 
+        c.id === selectedPlayer.id 
+          ? { ...c, stickersReceived: [...c.stickersReceived, newSticker] }
+          : c
+      ));
+      
+      setSelectedPlayer(prev => prev ? {
+        ...prev,
+        stickersReceived: [...prev.stickersReceived, newSticker]
+      } : null);
+      
+      showToast(`Sent ${sticker.emoji} to ${selectedPlayer.nickname}!`, '🎁');
+      setShowStickerPicker(false);
+    } catch (error) {
+      console.error('Error sending sticker:', error);
+      showToast('Failed to send sticker', '❌');
+    }
   };
 
   // Unlock badge for player
-  const unlockBadge = (badge: Badge) => {
+  const unlockBadge = async (badge: Badge) => {
     if (!selectedPlayer) return;
     
-    // Check if already unlocked
     const alreadyHas = selectedPlayer.badges.some(b => b.id === badge.id);
     if (alreadyHas) {
       showToast(`${selectedPlayer.nickname} already has this badge!`, '❌');
       return;
     }
     
-    const unlockedBadge = { ...badge, unlocked: true };
-    setClassmates(prev => prev.map(c => 
-      c.id === selectedPlayer.id 
-        ? { ...c, badges: [...c.badges, unlockedBadge] }
-        : c
-    ));
-    
-    setSelectedPlayer(prev => prev ? {
-      ...prev,
-      badges: [...prev.badges, unlockedBadge]
-    } : null);
-    
-    showToast(`Unlocked ${badge.icon} for ${selectedPlayer.nickname}!`, '🔓');
-    setShowBadgePicker(false);
+    try {
+      await dbUnlockBadge(selectedPlayer.id, badge.id);
+      
+      const unlockedBadge = { ...badge, unlocked: true };
+      setClassmates(prev => prev.map(c => 
+        c.id === selectedPlayer.id 
+          ? { ...c, badges: [...c.badges, unlockedBadge] }
+          : c
+      ));
+      
+      setSelectedPlayer(prev => prev ? {
+        ...prev,
+        badges: [...prev.badges, unlockedBadge]
+      } : null);
+      
+      showToast(`Unlocked ${badge.icon} for ${selectedPlayer.nickname}!`, '🔓');
+      setShowBadgePicker(false);
+    } catch (error) {
+      console.error('Error unlocking badge:', error);
+      showToast('Failed to unlock badge', '❌');
+    }
   };
 
   // Handle photo upload
@@ -251,34 +236,60 @@ export default function Classmates() {
   };
 
   // Submit profile
-  const handleSubmitProfile = () => {
+  const handleSubmitProfile = async () => {
     if (!profileForm.fullName.trim() || !profileForm.nickname.trim() || !profileForm.birthday) {
       showToast('Please fill in all required fields!', '❌');
       return;
     }
 
-    const newPlayer: Classmate = {
-      id: `user-${Date.now()}`,
-      fullName: profileForm.fullName.trim(),
-      nickname: profileForm.nickname.trim(),
-      photo: previewPhoto || '',
-      birthday: profileForm.birthday,
-      mbti: profileForm.mbti,
-      zodiac: profileForm.zodiac,
-      favoriteDrink: profileForm.favoriteDrink,
-      socialLinks: { instagram: profileForm.instagram.trim() || undefined },
-      badges: [],
-      stickersReceived: [],
-      playerNumber: classmates.length + 1,
-    };
+    try {
+      setIsLoading(true);
+      
+      // Upload photo if provided
+      let photoUrl = previewPhoto || '';
+      if (previewPhoto && previewPhoto.startsWith('data:')) {
+        // Convert data URL to blob and upload
+        const response = await fetch(previewPhoto);
+        const blob = await response.blob();
+        const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
+        photoUrl = await uploadFile('avatars', file);
+      }
 
-    setUserProfile(newPlayer); // Store user's profile separately
-    setClassmates(prev => [...prev, newPlayer]);
-    setHasProfile(true);
-    setShowProfileForm(false);
-    setProfileForm({ fullName: '', nickname: '', birthday: '', mbti: 'INTJ', zodiac: 'Aries', favoriteDrink: 'Coffee', instagram: '' });
-    setPreviewPhoto(null);
-    showToast('Welcome to the roster! 🎮', '✨');
+      const newPlayer: Classmate = {
+        id: '', // Will be set by Supabase
+        fullName: profileForm.fullName.trim(),
+        nickname: profileForm.nickname.trim(),
+        photo: photoUrl,
+        birthday: profileForm.birthday,
+        mbti: profileForm.mbti,
+        zodiac: profileForm.zodiac,
+        favoriteDrink: profileForm.favoriteDrink,
+        socialLinks: { instagram: profileForm.instagram.trim() || undefined },
+        badges: [],
+        stickersReceived: [],
+        playerNumber: classmates.length + 1,
+      };
+
+      await upsertProfile(newPlayer);
+      
+      // Reload current user profile
+      const currentUser = await fetchCurrentUserProfile();
+      if (currentUser) {
+        setUserProfile(currentUser);
+        setClassmates(prev => [...prev, currentUser]);
+        setHasProfile(true);
+      }
+      
+      setShowProfileForm(false);
+      setProfileForm({ fullName: '', nickname: '', birthday: '', mbti: 'INTJ', zodiac: 'Aries', favoriteDrink: 'Coffee', instagram: '' });
+      setPreviewPhoto(null);
+      showToast('Welcome to the roster! 🎮', '✨');
+    } catch (error) {
+      console.error('Error submitting profile:', error);
+      showToast('Failed to create profile', '❌');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
