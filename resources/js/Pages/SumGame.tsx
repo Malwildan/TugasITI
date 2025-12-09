@@ -464,12 +464,6 @@ export default function SumGame() {
                             <input type="checkbox" checked={isLightMode} onChange={e => setIsLightMode(e.target.checked)} style={{ marginRight: '5px' }} />
                             Light Colors
                         </label>
-                        <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                            <input type="checkbox" checked={bgmEnabled} onChange={e => setBgmEnabled(e.target.checked)} style={{ marginRight: '5px' }} />
-                            BGM
-                        </label>
-                        <span>🎵</span>
-                        <input type="range" min="0" max="100" value={volume} onChange={e => setVolume(Number(e.target.value))} style={{ width: '60px', cursor: 'pointer' }} />
                     </div>
                 </div>
             </div>
