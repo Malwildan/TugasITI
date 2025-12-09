@@ -188,7 +188,7 @@ export default function Dashboard() {
                   <span className="btn-mint" />
                   <span className="btn-cyan" />
                 </div>
-                <button className="machine-action-btn" onClick={() => window.open('/resources/js/Pages/sumgame.html', '_blank')}>PLAY</button>
+                <button className="machine-action-btn" onClick={() => navigate('/sum-game')}>PLAY</button>
               </div>
             </div>
 

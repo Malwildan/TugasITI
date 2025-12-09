@@ -21,6 +21,7 @@ import ResetPassword from './Pages/Auth/ResetPassword';
 import VerifyEmail from './Pages/Auth/VerifyEmail';
 import ConfirmPassword from './Pages/Auth/ConfirmPassword';
 import ProfileEdit from './Pages/Profile/Edit';
+import SumGame from './Pages/SumGame';
 
 function App() {
     return (
@@ -44,6 +45,14 @@ function App() {
                     <Route path="/welcome" element={<Continue />} />
 
                     {/* Protected */}
+                    <Route
+                        path="/sum-game"
+                        element={
+                            <ProtectedRoute>
+                                <SumGame />
+                            </ProtectedRoute>
+                        }
+                    />
                     <Route
                         path="/dashboard"
                         element={
