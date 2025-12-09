@@ -108,7 +108,7 @@ export default function StatLab() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, ease: 'easeOut' },
+      transition: { duration: 0.5, ease: 'easeOut' as any },
     },
   };
 
@@ -191,7 +191,7 @@ export default function StatLab() {
             className="loading-bar-fill"
             initial={{ width: 0 }}
             animate={{ width: '100%' }}
-            transition={{ duration: 2, ease: 'easeInOut' }}
+            transition={{ duration: 2, ease: 'easeInOut' as any }}
           />
         </div>
       </motion.header>
