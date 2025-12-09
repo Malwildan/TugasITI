@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 export default function SumGame() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    const timerContainerRef = useRef<HTMLDivElement>(null);
     
     // Game State
     const [score, setScore] = useState(0);
@@ -24,9 +25,21 @@ export default function SumGame() {
         timerInterval: null as any,
         GRID_COLS: 17,
         GRID_ROWS: 10,
-        GAME_DURATION: 120
+        GAME_DURATION: 120,
+        // Sync state to ref for event handlers
+        isGameStarted: false,
+        isGameOver: false,
+        isLightMode: false
     });
 
+    // Sync React state to Ref
+    useEffect(() => {
+        gameState.current.isGameStarted = isGameStarted;
+        gameState.current.isGameOver = isGameOver;
+        gameState.current.isLightMode = isLightMode;
+    }, [isGameStarted, isGameOver, isLightMode]);
+
+    // Effect 1: Canvas, Input, Animation Loop (Visuals)
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
@@ -35,51 +48,6 @@ export default function SumGame() {
         const state = gameState.current;
 
         // --- Game Logic Functions ---
-
-        const spawnAppleAt = (r: number, c: number) => {
-            const val = Math.floor(Math.random() * 9) + 1;
-            const existingIndex = state.apples.findIndex(a => a.r === r && a.c === c);
-            
-            const apple = {
-                r, c, val,
-                scale: 0,
-                removed: false
-            };
-
-            if (existingIndex !== -1) {
-                state.apples[existingIndex] = apple;
-            } else {
-                state.apples.push(apple);
-            }
-        };
-
-        const resetGame = () => {
-            setScore(0);
-            setTimeLeft(state.GAME_DURATION);
-            setIsGameOver(false);
-            state.apples = [];
-            state.feedbackBox = null;
-
-            // Populate Grid
-            for (let r = 0; r < state.GRID_ROWS; r++) {
-                for (let c = 0; c < state.GRID_COLS; c++) {
-                    spawnAppleAt(r, c);
-                }
-            }
-
-            // Start Timer
-            if (state.timerInterval) clearInterval(state.timerInterval);
-            state.timerInterval = setInterval(() => {
-                setTimeLeft(prev => {
-                    if (prev <= 1) {
-                        clearInterval(state.timerInterval);
-                        setIsGameOver(true);
-                        return 0;
-                    }
-                    return prev - 1;
-                });
-            }, 1000);
-        };
 
         const getNormalizedRect = (x1: number, y1: number, x2: number, y2: number) => ({
             x: Math.min(x1, x2),
@@ -115,8 +83,9 @@ export default function SumGame() {
         };
 
         const handleInputStart = (e: any) => {
-            if (!isGameStarted) return;
-            if (isGameOver) return;
+            // Use ref state to avoid closure staleness
+            if (!state.isGameStarted) return;
+            if (state.isGameOver) return;
 
             e.preventDefault();
             const pos = getPointerPos(e);
@@ -148,7 +117,11 @@ export default function SumGame() {
             const sum = selectedApples.reduce((s, a) => s + a.val, 0);
 
             if (sum === 10) {
+                // We need to update React state for score, but we are in a closure.
+                // We can't easily call setScore(prev => ...) inside this event handler if it's not re-bound.
+                // Actually, setScore is stable.
                 setScore(prev => prev + selectedApples.length);
+                
                 state.feedbackBox = { ...rect, color: '#00e676', timestamp: performance.now() };
                 
                 selectedApples.forEach(a => {
@@ -165,7 +138,7 @@ export default function SumGame() {
         const draw = (timestamp: number) => {
             if (!canvas || !ctx) return;
 
-            // Update
+            // Update animations
             state.apples.forEach(a => {
                 if (a.scale < 1) {
                     a.scale += 0.1;
@@ -177,10 +150,10 @@ export default function SumGame() {
                 state.feedbackBox = null;
             }
 
-            // Draw
+            // Draw Background
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Apples
+            // Draw Apples
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.font = `bold ${state.cellSize * 0.6}px Arial`;
@@ -191,7 +164,8 @@ export default function SumGame() {
                 const centerY = (a.r * state.cellSize) + (state.cellSize / 2);
                 const radius = (state.cellSize * 0.4) * a.scale;
 
-                ctx.fillStyle = isLightMode ? '#ffadad' : '#e74c3c';
+                // Use ref state for light mode
+                ctx.fillStyle = state.isLightMode ? '#ffadad' : '#e74c3c';
                 ctx.beginPath();
                 ctx.arc(centerX, centerY + radius*0.1, radius, 0, Math.PI * 2);
                 ctx.fill();
@@ -207,7 +181,7 @@ export default function SumGame() {
             });
 
             // Selection Box
-            if (state.input.isDragging && !isGameOver) {
+            if (state.input.isDragging && !state.isGameOver) {
                 const rect = getNormalizedRect(state.input.startX, state.input.startY, state.input.currX, state.input.currY);
                 ctx.fillStyle = 'rgba(0, 200, 83, 0.3)';
                 ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
@@ -216,7 +190,7 @@ export default function SumGame() {
                 ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
             }
 
-            // Feedback
+            // Feedback Flash
             if (state.feedbackBox) {
                 ctx.strokeStyle = state.feedbackBox.color;
                 ctx.lineWidth = 5;
@@ -236,7 +210,7 @@ export default function SumGame() {
         const resizeCanvas = () => {
             if (!containerRef.current || !canvas) return;
             
-            const maxW = window.innerWidth * 0.9;
+            const maxW = window.innerWidth * 0.85; // Slightly less to make room for timer
             const maxH = window.innerHeight * 0.75;
             
             const maxCellWidth = maxW / state.GRID_COLS;
@@ -254,6 +228,11 @@ export default function SumGame() {
                 containerRef.current.style.width = `${finalW}px`;
                 containerRef.current.style.height = `${finalH}px`;
                 containerRef.current.style.backgroundSize = `${state.cellSize}px ${state.cellSize}px`;
+            }
+
+            // Sync timer height to canvas height
+            if (timerContainerRef.current) {
+                timerContainerRef.current.style.height = `${finalH}px`;
             }
         };
 
@@ -278,61 +257,53 @@ export default function SumGame() {
             window.removeEventListener('touchmove', handleInputMove);
             window.removeEventListener('touchend', handleInputEnd);
             cancelAnimationFrame(animationFrameId);
-            if (state.timerInterval) clearInterval(state.timerInterval);
+            // NOTE: We do NOT clear timerInterval here anymore!
         };
-    }, [isGameStarted, isGameOver, isLightMode]); // Re-bind when game state changes
+    }, []); // Run once!
 
-    // Start Game Handler
-    const handleStartGame = () => {
-        setIsGameStarted(true);
-        gameState.current.apples = []; // Clear any existing
-        
-        // Need to trigger the reset logic inside the effect or call it here
-        // Since resetGame is inside useEffect, we can't call it directly.
-        // But setting isGameStarted(true) triggers the effect.
-        // We need a way to initialize the grid.
-        
-        // Let's move initialization logic to a separate effect or ref
-        // Actually, simpler: just manually init grid here for now, or rely on effect
-        
-        // Better: The effect depends on isGameStarted. 
-        // When isGameStarted becomes true, we should init the game.
-    };
-
-    // Effect to handle game start/reset
+    // Effect 2: Game Logic (Timer & Grid Init)
     useEffect(() => {
         if (isGameStarted && !isGameOver) {
-            // Initialize grid
             const state = gameState.current;
-            state.apples = [];
-            for (let r = 0; r < state.GRID_ROWS; r++) {
-                for (let c = 0; c < state.GRID_COLS; c++) {
-                    const val = Math.floor(Math.random() * 9) + 1;
-                    state.apples.push({ r, c, val, scale: 0, removed: false });
+            
+            // Initialize grid if empty
+            if (state.apples.length === 0) {
+                for (let r = 0; r < state.GRID_ROWS; r++) {
+                    for (let c = 0; c < state.GRID_COLS; c++) {
+                        const val = Math.floor(Math.random() * 9) + 1;
+                        state.apples.push({ r, c, val, scale: 0, removed: false });
+                    }
                 }
             }
             
             // Start timer
-            if (state.timerInterval) clearInterval(state.timerInterval);
-            state.timerInterval = setInterval(() => {
+            const interval = setInterval(() => {
                 setTimeLeft(prev => {
                     if (prev <= 1) {
-                        clearInterval(state.timerInterval);
                         setIsGameOver(true);
                         return 0;
                     }
                     return prev - 1;
                 });
             }, 1000);
+            
+            return () => clearInterval(interval);
         }
-    }, [isGameStarted]);
+    }, [isGameStarted, isGameOver]);
+
+    const handleStartGame = () => {
+        gameState.current.apples = []; // Clear for new game
+        setIsGameStarted(true);
+        setIsGameOver(false);
+        setScore(0);
+        setTimeLeft(120);
+    };
 
     const handleReset = () => {
         setIsGameStarted(false);
         setIsGameOver(false);
         setScore(0);
         setTimeLeft(120);
-        if (gameState.current.timerInterval) clearInterval(gameState.current.timerInterval);
     };
 
     return (
@@ -414,7 +385,8 @@ export default function SumGame() {
                             <div style={{
                                 position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
                                 backgroundColor: 'rgba(0,0,0,0.85)', display: 'flex', flexDirection: 'column',
-                                justifyContent: 'center', alignItems: 'center', color: '#fff'
+                                justifyContent: 'center', alignItems: 'center', color: '#fff',
+                                zIndex: 10
                             }}>
                                 <h1 style={{ fontSize: '40px', marginBottom: '20px' }}>Sum Fruit</h1>
                                 <div style={{ textAlign: 'center', marginBottom: '30px', lineHeight: '1.6' }}>
@@ -424,7 +396,9 @@ export default function SumGame() {
                                 <button onClick={handleStartGame} style={{
                                     backgroundColor: '#27ae60', color: '#fff', border: 'none',
                                     padding: '15px 40px', fontSize: '24px', fontWeight: 'bold',
-                                    cursor: 'pointer', borderRadius: '5px'
+                                    cursor: 'pointer', borderRadius: '5px',
+                                    boxShadow: '0 4px 0 #1e8449',
+                                    transition: 'transform 0.1s'
                                 }}>Start Game</button>
                             </div>
                         )}
@@ -434,32 +408,41 @@ export default function SumGame() {
                             <div style={{
                                 position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
                                 backgroundColor: 'rgba(0,0,0,0.85)', display: 'flex', flexDirection: 'column',
-                                justifyContent: 'center', alignItems: 'center', color: '#fff'
+                                justifyContent: 'center', alignItems: 'center', color: '#fff',
+                                zIndex: 10
                             }}>
                                 <h1 style={{ fontSize: '40px', marginBottom: '10px' }}>Time's Up!</h1>
                                 <h2 style={{ fontSize: '30px', marginBottom: '30px' }}>Final Score: {score}</h2>
                                 <button onClick={handleReset} style={{
                                     backgroundColor: '#27ae60', color: '#fff', border: '2px solid #1b8f4d',
                                     padding: '10px 30px', fontSize: '24px', fontWeight: 'bold',
-                                    cursor: 'pointer', borderRadius: '5px'
+                                    cursor: 'pointer', borderRadius: '5px',
+                                    boxShadow: '0 4px 0 #1e8449'
                                 }}>Play Again</button>
                             </div>
                         )}
                     </div>
 
                     {/* Timer Bar */}
-                    <div style={{
-                        width: '15px', height: '100%', backgroundColor: '#ccc',
-                        borderRadius: '8px', overflow: 'hidden', display: 'flex',
-                        justifyContent: 'center', alignItems: 'flex-end', padding: '2px',
-                        boxSizing: 'border-box'
+                    <div ref={timerContainerRef} style={{
+                        width: '30px', // Wider bar
+                        backgroundColor: '#e0e0e0',
+                        borderRadius: '15px',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'flex-end',
+                        padding: '4px',
+                        boxSizing: 'border-box',
+                        border: '2px solid #ccc'
                     }}>
                         <div style={{
                             width: '100%',
                             height: `${(timeLeft / 120) * 100}%`,
-                            backgroundColor: '#00c853',
-                            borderRadius: '6px',
-                            transition: 'height 0.1s linear'
+                            backgroundColor: timeLeft < 20 ? '#ff5252' : '#00c853', // Red when low
+                            borderRadius: '10px',
+                            transition: 'height 1s linear, background-color 0.3s',
+                            boxShadow: 'inset 0 0 10px rgba(0,0,0,0.1)'
                         }} />
                     </div>
                 </div>
