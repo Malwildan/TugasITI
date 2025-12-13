@@ -5575,3 +5575,629 @@ select.form-input option:checked {
   transform: translateY(0);
   box-shadow: 0 2px 0 #228822;
 }
+
+/* ========================================
+   RESPONSIVE - TABLET (max-width: 1024px)
+   ======================================== */
+@media (max-width: 1024px) {
+  /* Dashboard Grid: 3 → 2 columns */
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  /* HUD Ribbon */
+  .hud-ribbon {
+    padding: 0.75rem 1.5rem;
+    gap: 1rem;
+  }
+
+  .hud-title {
+    font-size: 0.55rem;
+  }
+
+  .hud-blink {
+    font-size: 0.45rem;
+  }
+
+  .hud-ready-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.6rem;
+  }
+
+  /* Dashboard Card */
+  .dashboard-main-card {
+    padding: 10px;
+  }
+
+  .dashboard-inner-card {
+    padding: 1.25rem;
+  }
+
+  /* Arcade Machines */
+  .arcade-machine {
+    padding: 0.75rem;
+  }
+
+  .machine-screen {
+    min-height: 150px;
+    padding: 1rem;
+  }
+
+  .machine-marquee {
+    font-size: 0.55rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .machine-title {
+    font-size: 0.9rem;
+  }
+
+  .machine-desc {
+    font-size: 1rem;
+  }
+
+  .machine-stats {
+    font-size: 0.35rem;
+  }
+
+  .machine-controls {
+    padding: 0.5rem 0.6rem;
+  }
+
+  .machine-joystick {
+    width: 30px;
+    height: 30px;
+  }
+
+  .machine-buttons {
+    grid-template-columns: repeat(2, 16px);
+    gap: 4px;
+  }
+
+  .machine-buttons span {
+    width: 16px;
+    height: 16px;
+  }
+
+  .machine-action-btn {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.5rem;
+  }
+
+  /* Login/Auth Forms */
+  .arcade-outer-card {
+    width: min(580px, 95%);
+    padding: 12px;
+  }
+
+  .arcade-inner-panel {
+    padding: 1.75rem;
+  }
+
+  /* Modals */
+  .modal-content {
+    max-width: 90%;
+    padding: 1.25rem;
+  }
+
+  .picker-modal {
+    max-width: 380px;
+  }
+
+  .sticker-picker-grid,
+  .badge-picker-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+  }
+
+  /* Players Grid */
+  .players-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+/* ========================================
+   RESPONSIVE - MOBILE (max-width: 640px)
+   ======================================== */
+@media (max-width: 640px) {
+  /* Dashboard Grid: → 1 column */
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  /* HUD */
+  .dashboard-hud {
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .hud-ribbon {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 0.75rem;
+    border-radius: 20px;
+  }
+
+  .hud-title {
+    font-size: 0.5rem;
+    text-align: center;
+  }
+
+  .hud-status {
+    justify-content: center;
+  }
+
+  .hud-blink {
+    font-size: 0.4rem;
+  }
+
+  .hud-ready-btn {
+    width: 100%;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.55rem;
+    border-radius: 14px;
+  }
+
+  /* Dashboard Card */
+  .dashboard-main-card {
+    width: 95%;
+    padding: 8px;
+    border-radius: 24px;
+  }
+
+  .dashboard-inner-card {
+    padding: 1rem;
+    border-radius: 20px;
+  }
+
+  /* Dashboard Header */
+  .dashboard-header-bar {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .dashboard-header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .dashboard-level {
+    font-size: 0.45rem;
+  }
+
+  .dashboard-timer {
+    font-size: 0.45rem;
+  }
+
+  .dashboard-dots {
+    gap: 4px;
+  }
+
+  .dashboard-dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  /* Arcade Machines */
+  .arcade-machine {
+    padding: 0.75rem;
+    border-radius: 20px;
+  }
+
+  .machine-screen {
+    min-height: 140px;
+    padding: 1rem;
+    border-radius: 14px;
+  }
+
+  .machine-marquee {
+    font-size: 0.5rem;
+    padding: 0.5rem 0.6rem;
+    border-radius: 10px;
+  }
+
+  .machine-player {
+    font-size: 0.4rem;
+  }
+
+  .machine-title {
+    font-size: 0.85rem;
+  }
+
+  .machine-desc {
+    font-size: 0.95rem;
+    line-height: 1.3;
+  }
+
+  .machine-stats {
+    font-size: 0.32rem;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .machine-controls {
+    padding: 0.5rem;
+    border-radius: 10px;
+    gap: 0.5rem;
+  }
+
+  .machine-joystick {
+    width: 28px;
+    height: 28px;
+  }
+
+  .machine-joystick::after {
+    width: 10px;
+    height: 10px;
+  }
+
+  .machine-buttons {
+    grid-template-columns: repeat(2, 14px);
+    gap: 3px;
+  }
+
+  .machine-buttons span {
+    width: 14px;
+    height: 14px;
+  }
+
+  .machine-action-btn {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.45rem;
+    border-radius: 8px;
+  }
+
+  /* Login/Auth Forms */
+  .login-arcade-bg {
+    padding: 1rem;
+  }
+
+  .arcade-outer-card {
+    width: 100%;
+    padding: 10px;
+    border-radius: 24px;
+  }
+
+  .arcade-inner-card {
+    border-radius: 18px;
+  }
+
+  .arcade-inner-panel {
+    padding: 1.5rem 1rem;
+    border-radius: 16px;
+  }
+
+  .arcade-main-title {
+    font-size: 1.2rem;
+  }
+
+  .arcade-dark-label {
+    font-size: 0.6rem;
+  }
+
+  .arcade-dark-input {
+    padding: 0.8rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .arcade-submit-btn {
+    padding: 0.9rem;
+    font-size: 0.6rem;
+  }
+
+  /* Modals */
+  .modal-overlay {
+    padding: 0.5rem;
+  }
+
+  .modal-content {
+    max-width: 95%;
+    padding: 1rem;
+    border-radius: 12px;
+    max-height: 90vh;
+  }
+
+  .modal-close {
+    width: 28px;
+    height: 28px;
+    font-size: 0.9rem;
+  }
+
+  .modal-player-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+    text-align: center;
+  }
+
+  .modal-photo-square {
+    width: 100px;
+    height: 100px;
+  }
+
+  .modal-player-info {
+    align-items: center;
+  }
+
+  .picker-modal {
+    max-width: 95%;
+  }
+
+  .picker-title {
+    font-size: 0.6rem;
+    margin-bottom: 1rem;
+  }
+
+  .sticker-picker-grid,
+  .badge-picker-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
+  .sticker-option,
+  .badge-option {
+    padding: 0.6rem 0.4rem;
+  }
+
+  .sticker-opt-emoji,
+  .badge-opt-emoji {
+    font-size: 1.3rem;
+  }
+
+  .sticker-opt-name,
+  .badge-opt-name {
+    font-size: 0.75rem;
+  }
+
+  /* Players Grid */
+  .players-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .player-card {
+    padding: 1rem;
+  }
+
+  /* Profile Warning & Cards */
+  .add-profile-warning {
+    flex-direction: column;
+    text-align: center;
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .warning-icon {
+    font-size: 2rem;
+  }
+
+  .warning-title {
+    font-size: 0.6rem;
+  }
+
+  .add-profile-btn {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.5rem;
+  }
+
+  .your-profile-card {
+    padding: 1rem;
+  }
+
+  .your-profile-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .your-profile-title {
+    font-size: 0.6rem;
+  }
+
+  .your-profile-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+
+  .your-profile-stats {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Section Headers */
+  .section-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .section-header h3 {
+    font-size: 0.55rem;
+  }
+
+  /* Form Elements */
+  .form-group {
+    gap: 0.3rem;
+  }
+
+  .form-label {
+    font-size: 0.45rem;
+  }
+
+  .form-input {
+    padding: 0.65rem 0.8rem;
+    font-size: 1rem;
+  }
+
+  .submit-profile-btn {
+    padding: 0.85rem;
+    font-size: 0.6rem;
+  }
+}
+
+/* ========================================
+   RESPONSIVE - SMALL MOBILE (max-width: 480px)
+   ======================================== */
+@media (max-width: 480px) {
+  /* Dashboard */
+  .dashboard-main-card {
+    padding: 6px;
+    border-radius: 20px;
+  }
+
+  .dashboard-inner-card {
+    padding: 0.75rem;
+    border-radius: 16px;
+  }
+
+  .dashboard-level,
+  .dashboard-timer {
+    font-size: 0.4rem;
+  }
+
+  /* Arcade Machines */
+  .arcade-machine {
+    padding: 0.5rem;
+    border-radius: 16px;
+  }
+
+  .machine-screen {
+    min-height: 120px;
+    padding: 0.75rem;
+    border-radius: 12px;
+  }
+
+  .machine-marquee {
+    font-size: 0.45rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 8px;
+  }
+
+  .machine-title {
+    font-size: 0.75rem;
+  }
+
+  .machine-desc {
+    font-size: 0.9rem;
+  }
+
+  .machine-controls {
+    padding: 0.4rem;
+    border-radius: 8px;
+  }
+
+  .machine-action-btn {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.4rem;
+  }
+
+  /* HUD */
+  .hud-ribbon {
+    padding: 0.75rem;
+    border-radius: 16px;
+  }
+
+  .hud-title {
+    font-size: 0.45rem;
+  }
+
+  .hud-led {
+    width: 10px;
+    height: 10px;
+  }
+
+  .hud-blink {
+    font-size: 0.35rem;
+  }
+
+  .hud-ready-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.5rem;
+  }
+
+  /* Login Forms */
+  .arcade-outer-card {
+    padding: 6px;
+    border-radius: 20px;
+  }
+
+  .arcade-inner-panel {
+    padding: 1.25rem 0.75rem;
+  }
+
+  .arcade-main-title {
+    font-size: 1rem;
+  }
+
+  .arcade-dark-label {
+    font-size: 0.55rem;
+  }
+
+  .arcade-dark-input {
+    padding: 0.7rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .arcade-submit-btn {
+    padding: 0.8rem;
+    font-size: 0.55rem;
+  }
+
+  /* Modals */
+  .modal-content {
+    padding: 0.75rem;
+    border-radius: 10px;
+  }
+
+  .modal-photo-square {
+    width: 80px;
+    height: 80px;
+  }
+
+  .sticker-picker-grid,
+  .badge-picker-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
+  }
+
+  .sticker-option,
+  .badge-option {
+    padding: 0.5rem 0.3rem;
+    border-radius: 8px;
+  }
+
+  .sticker-opt-emoji,
+  .badge-opt-emoji {
+    font-size: 1.2rem;
+  }
+
+  .sticker-opt-name,
+  .badge-opt-name {
+    font-size: 0.7rem;
+  }
+
+  /* Player Cards */
+  .player-card {
+    padding: 0.75rem;
+  }
+
+  .player-nickname {
+    font-size: 0.65rem;
+  }
+
+  .player-fullname {
+    font-size: 0.9rem;
+  }
+
+  .action-btn {
+    font-size: 0.9rem;
+    padding: 0.4rem;
+  }
+}

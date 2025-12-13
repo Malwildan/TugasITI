@@ -5,7 +5,7 @@ export default function SumGame() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const timerContainerRef = useRef<HTMLDivElement>(null);
-    
+
     // Game State
     const [score, setScore] = useState(0);
     const [timeLeft, setTimeLeft] = useState(120);
@@ -99,7 +99,7 @@ export default function SumGame() {
         const handleInputMove = (e: any) => {
             if (!state.input.isDragging) return;
             if (e.touches) e.preventDefault();
-            
+
             const pos = getPointerPos(e);
             state.input.currX = pos.x;
             state.input.currY = pos.y;
@@ -110,7 +110,7 @@ export default function SumGame() {
             state.input.isDragging = false;
 
             const rect = getNormalizedRect(state.input.startX, state.input.startY, state.input.currX, state.input.currY);
-            
+
             if (rect.w < 2 && rect.h < 2) return;
 
             const selectedApples = getSelectedApples(rect);
@@ -121,9 +121,9 @@ export default function SumGame() {
                 // We can't easily call setScore(prev => ...) inside this event handler if it's not re-bound.
                 // Actually, setScore is stable.
                 setScore(prev => prev + selectedApples.length);
-                
+
                 state.feedbackBox = { ...rect, color: '#00e676', timestamp: performance.now() };
-                
+
                 selectedApples.forEach(a => {
                     const idx = state.apples.findIndex(x => x.r === a.r && x.c === a.c);
                     if (idx !== -1) state.apples[idx].removed = true;
@@ -167,17 +167,17 @@ export default function SumGame() {
                 // Use ref state for light mode
                 ctx.fillStyle = state.isLightMode ? '#ffadad' : '#e74c3c';
                 ctx.beginPath();
-                ctx.arc(centerX, centerY + radius*0.1, radius, 0, Math.PI * 2);
+                ctx.arc(centerX, centerY + radius * 0.1, radius, 0, Math.PI * 2);
                 ctx.fill();
-                
+
                 ctx.strokeStyle = '#8d6e63';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.arc(centerX, centerY - radius, radius * 0.3, Math.PI*0.7, Math.PI*1.3);
+                ctx.arc(centerX, centerY - radius, radius * 0.3, Math.PI * 0.7, Math.PI * 1.3);
                 ctx.stroke();
 
                 ctx.fillStyle = '#fff';
-                ctx.fillText(a.val.toString(), centerX, centerY + radius*0.1);
+                ctx.fillText(a.val.toString(), centerX, centerY + radius * 0.1);
             });
 
             // Selection Box
@@ -209,21 +209,21 @@ export default function SumGame() {
 
         const resizeCanvas = () => {
             if (!containerRef.current || !canvas) return;
-            
+
             const maxW = window.innerWidth * 0.85; // Slightly less to make room for timer
             const maxH = window.innerHeight * 0.75;
-            
+
             const maxCellWidth = maxW / state.GRID_COLS;
             const maxCellHeight = maxH / state.GRID_ROWS;
-            
+
             state.cellSize = Math.floor(Math.min(maxCellWidth, maxCellHeight));
-            
+
             const finalW = state.cellSize * state.GRID_COLS;
             const finalH = state.cellSize * state.GRID_ROWS;
-            
+
             canvas.width = finalW;
             canvas.height = finalH;
-            
+
             if (containerRef.current) {
                 containerRef.current.style.width = `${finalW}px`;
                 containerRef.current.style.height = `${finalH}px`;
@@ -265,7 +265,7 @@ export default function SumGame() {
     useEffect(() => {
         if (isGameStarted && !isGameOver) {
             const state = gameState.current;
-            
+
             // Initialize grid if empty
             if (state.apples.length === 0) {
                 for (let r = 0; r < state.GRID_ROWS; r++) {
@@ -275,7 +275,7 @@ export default function SumGame() {
                     }
                 }
             }
-            
+
             // Start timer
             const interval = setInterval(() => {
                 setTimeLeft(prev => {
@@ -286,7 +286,7 @@ export default function SumGame() {
                     return prev - 1;
                 });
             }, 1000);
-            
+
             return () => clearInterval(interval);
         }
     }, [isGameStarted, isGameOver]);
@@ -309,96 +309,114 @@ export default function SumGame() {
     return (
         <div style={{
             margin: 0,
-            padding: 0,
+            padding: '10px',
             backgroundColor: '#00c853',
             color: '#fff',
             fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-            overflow: 'hidden',
+            overflow: 'auto',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            height: '100vh',
-            width: '100vw'
+            minHeight: '100vh',
+            width: '100vw',
+            boxSizing: 'border-box'
         }}>
             <div id="main-frame" style={{
                 backgroundColor: '#f0f0f0',
-                border: '10px solid #00e676',
-                borderRadius: '15px',
-                padding: '5px',
+                border: 'clamp(4px, 1.5vw, 10px) solid #00e676',
+                borderRadius: 'clamp(8px, 2vw, 15px)',
+                padding: 'clamp(3px, 1vw, 5px)',
                 boxShadow: '0 10px 20px rgba(0,0,0,0.2)',
                 display: 'flex',
-                flexDirection: 'column'
+                flexDirection: 'column',
+                maxWidth: '100%',
+                width: 'fit-content'
             }}>
                 {/* Header */}
                 <div style={{
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    padding: '8px 12px',
+                    padding: 'clamp(4px, 1.5vw, 8px) clamp(6px, 2vw, 12px)',
                     color: '#0a6b34',
-                    fontWeight: 800
+                    fontWeight: 800,
+                    flexWrap: 'wrap',
+                    gap: '8px'
                 }}>
                     <div className="pill" style={{
                         background: '#dff6e9',
                         border: '2px solid #2cc56a',
                         borderRadius: '999px',
-                        padding: '6px 12px',
-                        color: '#0a6b34'
+                        padding: 'clamp(4px, 1vw, 6px) clamp(8px, 2vw, 12px)',
+                        color: '#0a6b34',
+                        fontSize: 'clamp(10px, 2.5vw, 14px)',
+                        fontWeight: 700
                     }}>Sum Fruit</div>
-                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', gap: 'clamp(6px, 1.5vw, 12px)', alignItems: 'center', flexWrap: 'wrap' }}>
                         <div className="pill" style={{
                             background: '#dff6e9',
                             border: '2px solid #2cc56a',
                             borderRadius: '999px',
-                            padding: '6px 12px',
-                            color: '#0a6b34'
+                            padding: 'clamp(4px, 1vw, 6px) clamp(8px, 2vw, 12px)',
+                            color: '#0a6b34',
+                            fontSize: 'clamp(10px, 2.5vw, 14px)',
+                            fontWeight: 600
                         }}>Score: {score}</div>
                         <div className="pill" style={{
                             background: '#dff6e9',
                             border: '2px solid #2cc56a',
                             borderRadius: '999px',
-                            padding: '6px 12px',
-                            color: '#0a6b34'
+                            padding: 'clamp(4px, 1vw, 6px) clamp(8px, 2vw, 12px)',
+                            color: '#0a6b34',
+                            fontSize: 'clamp(10px, 2.5vw, 14px)',
+                            fontWeight: 600
                         }}>Time: {timeLeft}s</div>
                         <Link to="/dashboard" className="pill" style={{
                             textDecoration: 'none',
                             background: '#dff6e9',
                             border: '2px solid #2cc56a',
                             borderRadius: '999px',
-                            padding: '6px 12px',
-                            color: '#0a6b34'
+                            padding: 'clamp(4px, 1vw, 6px) clamp(8px, 2vw, 12px)',
+                            color: '#0a6b34',
+                            fontSize: 'clamp(10px, 2.5vw, 14px)',
+                            fontWeight: 600
                         }}>Back</Link>
                     </div>
                 </div>
 
                 {/* Content */}
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                <div style={{ display: 'flex', gap: 'clamp(5px, 1.5vw, 10px)', alignItems: 'flex-start' }}>
                     <div ref={containerRef} style={{
                         position: 'relative',
                         backgroundImage: 'linear-gradient(#e0e0e0 1px, transparent 1px), linear-gradient(90deg, #e0e0e0 1px, transparent 1px)',
-                        backgroundColor: '#fff'
+                        backgroundColor: '#fff',
+                        borderRadius: 'clamp(4px, 1vw, 8px)',
+                        overflow: 'hidden'
                     }}>
                         <canvas ref={canvasRef} style={{ cursor: 'crosshair', touchAction: 'none', display: 'block' }} />
-                        
+
                         {/* Start Overlay */}
                         {!isGameStarted && (
                             <div style={{
                                 position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
                                 backgroundColor: 'rgba(0,0,0,0.85)', display: 'flex', flexDirection: 'column',
                                 justifyContent: 'center', alignItems: 'center', color: '#fff',
-                                zIndex: 10
+                                zIndex: 10, padding: 'clamp(10px, 3vw, 20px)', boxSizing: 'border-box',
+                                textAlign: 'center'
                             }}>
-                                <h1 style={{ fontSize: '40px', marginBottom: '20px' }}>Sum Fruit</h1>
-                                <div style={{ textAlign: 'center', marginBottom: '30px', lineHeight: '1.6' }}>
-                                    <p>Drag to select apples. If sum == 10, they pop!</p>
-                                    <p>Score points and clear the board.</p>
+                                <h1 style={{ fontSize: 'clamp(20px, 6vw, 40px)', marginBottom: 'clamp(10px, 3vw, 20px)', margin: '0 0 clamp(10px, 3vw, 20px)' }}>Sum Fruit</h1>
+                                <div style={{ textAlign: 'center', marginBottom: 'clamp(15px, 4vw, 30px)', lineHeight: '1.5', fontSize: 'clamp(12px, 3vw, 16px)' }}>
+                                    <p style={{ margin: '0 0 8px' }}>Drag to select apples. If sum == 10, they pop!</p>
+                                    <p style={{ margin: 0 }}>Score points and clear the board.</p>
                                 </div>
                                 <button onClick={handleStartGame} style={{
                                     backgroundColor: '#27ae60', color: '#fff', border: 'none',
-                                    padding: '15px 40px', fontSize: '24px', fontWeight: 'bold',
+                                    padding: 'clamp(10px, 2.5vw, 15px) clamp(20px, 5vw, 40px)',
+                                    fontSize: 'clamp(14px, 4vw, 24px)', fontWeight: 'bold',
                                     cursor: 'pointer', borderRadius: '5px',
                                     boxShadow: '0 4px 0 #1e8449',
-                                    transition: 'transform 0.1s'
+                                    transition: 'transform 0.1s',
+                                    touchAction: 'manipulation'
                                 }}>Start Game</button>
                             </div>
                         )}
@@ -409,15 +427,18 @@ export default function SumGame() {
                                 position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
                                 backgroundColor: 'rgba(0,0,0,0.85)', display: 'flex', flexDirection: 'column',
                                 justifyContent: 'center', alignItems: 'center', color: '#fff',
-                                zIndex: 10
+                                zIndex: 10, padding: 'clamp(10px, 3vw, 20px)', boxSizing: 'border-box',
+                                textAlign: 'center'
                             }}>
-                                <h1 style={{ fontSize: '40px', marginBottom: '10px' }}>Time's Up!</h1>
-                                <h2 style={{ fontSize: '30px', marginBottom: '30px' }}>Final Score: {score}</h2>
+                                <h1 style={{ fontSize: 'clamp(20px, 6vw, 40px)', marginBottom: 'clamp(5px, 2vw, 10px)', margin: '0 0 clamp(5px, 2vw, 10px)' }}>Time's Up!</h1>
+                                <h2 style={{ fontSize: 'clamp(16px, 5vw, 30px)', marginBottom: 'clamp(15px, 4vw, 30px)', margin: '0 0 clamp(15px, 4vw, 30px)' }}>Final Score: {score}</h2>
                                 <button onClick={handleReset} style={{
                                     backgroundColor: '#27ae60', color: '#fff', border: '2px solid #1b8f4d',
-                                    padding: '10px 30px', fontSize: '24px', fontWeight: 'bold',
+                                    padding: 'clamp(8px, 2vw, 10px) clamp(15px, 4vw, 30px)',
+                                    fontSize: 'clamp(14px, 4vw, 24px)', fontWeight: 'bold',
                                     cursor: 'pointer', borderRadius: '5px',
-                                    boxShadow: '0 4px 0 #1e8449'
+                                    boxShadow: '0 4px 0 #1e8449',
+                                    touchAction: 'manipulation'
                                 }}>Play Again</button>
                             </div>
                         )}
@@ -425,22 +446,23 @@ export default function SumGame() {
 
                     {/* Timer Bar */}
                     <div ref={timerContainerRef} style={{
-                        width: '30px', // Wider bar
+                        width: 'clamp(16px, 4vw, 30px)',
                         backgroundColor: '#e0e0e0',
-                        borderRadius: '15px',
+                        borderRadius: 'clamp(8px, 2vw, 15px)',
                         overflow: 'hidden',
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'flex-end',
-                        padding: '4px',
+                        padding: 'clamp(2px, 0.5vw, 4px)',
                         boxSizing: 'border-box',
-                        border: '2px solid #ccc'
+                        border: '2px solid #ccc',
+                        flexShrink: 0
                     }}>
                         <div style={{
                             width: '100%',
                             height: `${(timeLeft / 120) * 100}%`,
-                            backgroundColor: timeLeft < 20 ? '#ff5252' : '#00c853', // Red when low
-                            borderRadius: '10px',
+                            backgroundColor: timeLeft < 20 ? '#ff5252' : '#00c853',
+                            borderRadius: 'clamp(6px, 1.5vw, 10px)',
                             transition: 'height 1s linear, background-color 0.3s',
                             boxShadow: 'inset 0 0 10px rgba(0,0,0,0.1)'
                         }} />
@@ -450,18 +472,24 @@ export default function SumGame() {
                 {/* Controls */}
                 <div style={{
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    padding: '10px', backgroundColor: '#00c853', color: '#fff',
-                    borderBottomLeftRadius: '10px', borderBottomRightRadius: '10px'
+                    padding: 'clamp(6px, 1.5vw, 10px)', backgroundColor: '#00c853', color: '#fff',
+                    borderBottomLeftRadius: 'clamp(6px, 1.5vw, 10px)',
+                    borderBottomRightRadius: 'clamp(6px, 1.5vw, 10px)',
+                    flexWrap: 'wrap',
+                    gap: '8px'
                 }}>
                     <button onClick={handleReset} style={{
                         backgroundColor: 'rgba(255,255,255,0.2)', border: '1px solid #fff',
-                        padding: '5px 15px', borderRadius: '5px', cursor: 'pointer',
-                        fontWeight: 'bold', color: '#fff'
+                        padding: 'clamp(4px, 1vw, 5px) clamp(10px, 2vw, 15px)',
+                        borderRadius: '5px', cursor: 'pointer',
+                        fontWeight: 'bold', color: '#fff',
+                        fontSize: 'clamp(11px, 2.5vw, 14px)',
+                        touchAction: 'manipulation'
                     }}>Reset</button>
-                    
-                    <div style={{ display: 'flex', gap: '15px', alignItems: 'center', fontSize: '14px' }}>
+
+                    <div style={{ display: 'flex', gap: 'clamp(8px, 2vw, 15px)', alignItems: 'center', fontSize: 'clamp(11px, 2.5vw, 14px)' }}>
                         <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                            <input type="checkbox" checked={isLightMode} onChange={e => setIsLightMode(e.target.checked)} style={{ marginRight: '5px' }} />
+                            <input type="checkbox" checked={isLightMode} onChange={e => setIsLightMode(e.target.checked)} style={{ marginRight: '5px', width: 'clamp(14px, 3vw, 18px)', height: 'clamp(14px, 3vw, 18px)' }} />
                             Light Colors
                         </label>
                     </div>
@@ -470,3 +498,4 @@ export default function SumGame() {
         </div>
     );
 }
+
