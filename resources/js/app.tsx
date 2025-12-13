@@ -39,8 +39,8 @@ function App() {
                         element={<Login status={null as any} canResetPassword={true} />}
                     />
                     <Route path="/register" element={<Register />} />
-                    <Route path="/forgot-password" element={<ForgotPassword status={null as any} />} />
-                    <Route path="/reset-password" element={<ResetPassword token="" email="" />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/verify-email" element={<VerifyEmail status={undefined} />} />
                     <Route path="/confirm-password" element={<ConfirmPassword />} />
                     <Route path="/welcome" element={<Continue />} />
@@ -53,15 +53,15 @@ function App() {
                         <Route path="/memory-reel" element={<MemoryReel />} />
                         <Route path="/sum-game" element={<SumGame />} />
                         <Route path="/continue" element={<Continue />} />
-                        <Route 
-                            path="/profile" 
+                        <Route
+                            path="/profile"
                             element={
-                                <ProfileEdit 
-                                    mustVerifyEmail={false} 
-                                    status={undefined} 
-                                    auth={{ user: { id: 0, name: 'User', email: 'user@example.com' } }} 
+                                <ProfileEdit
+                                    mustVerifyEmail={false}
+                                    status={undefined}
+                                    auth={{ user: { id: 0, name: 'User', email: 'user@example.com' } }}
                                 />
-                            } 
+                            }
                         />
                     </Route>
 
